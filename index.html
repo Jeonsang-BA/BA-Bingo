@@ -479,7 +479,7 @@
       </details>
 
       <div class="section-title" style="margin-top: 10px;">
-        <span>2. 빙고판에 넣을 캐릭터 선택</span>
+        <span>2. 빙고판에 넣을 학생 선택</span>
         <span class="badge" id="selectionCount">선택: 0 / 25</span>
       </div>
 
@@ -505,15 +505,15 @@
     <div id="gameArea" style="display: none; margin-top: 20px;">
       
       <div class="criteria-box">
-        <div class="criteria-label">🎯 빙고 판정 모드</div>
+        <div class="criteria-label">빙고 유형 선택</div>
         <div class="radio-group">
           <label class="radio-btn active" id="labelOwnership" onclick="setCriteria('ownership')">
             <input type="radio" name="bingoCriteria" value="ownership" checked>
-            <span>🟡 단순 보유 기준 (성급/전무 무관 체크된 칸 전체)</span>
+            <span>🟡 보유여부</span>
           </label>
           <label class="radio-btn" id="labelWeapon" onclick="setCriteria('weapon')">
             <input type="radio" name="bingoCriteria" value="weapon">
-            <span>🔵 전용무기 기준 (전1~전4 조건 칸만)</span>
+            <span>🔵 전무빙고</span>
           </label>
         </div>
       </div>
@@ -526,8 +526,8 @@
       <div class="help-hint">💡 칸을 클릭하여 해당 캐릭터 보유/달성 상태를 체크/해제합니다.</div>
 
       <div class="mode-bar">
-        <button class="mode-btn" id="btnEditMode" onclick="toggleEditMode()">✏️ 배치/조건(3성, 전2 등) 직접 수정</button>
-        <button class="action-btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onclick="shuffleCurrentBoard()">🔀 무작위 다시 섞기</button>
+        <button class="mode-btn" id="btnEditMode" onclick="toggleEditMode()">✏️ 빙고배치/육성상태(3성, 전2 등) 수정</button>
+        <button class="action-btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onclick="shuffleCurrentBoard()">🔀 랜덤 배치</button>
       </div>
       
       <div class="grid" id="board"></div>
