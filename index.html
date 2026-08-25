@@ -553,28 +553,39 @@
     let draggedIndex = null;
 
 // 1. 앱 초기화 (공유 링크 접속 시 덮어쓰기 방지)
+   // 1. 데이터가 완전히 준비된 후 앱 실행을 보장하는 함수
     function initApp() {
-      if (window.DEFAULT_ITEMS && window.DEFAULT_ITEMS.length > 0) {
-        itemList = JSON.parse(JSON.stringify(window.DEFAULT_ITEMS));
-      } else {
-        try {
-          const saved = localStorage.getItem("custom_image_bingo_items");
-          itemList = saved ? JSON.parse(saved) : [];
-        } catch (e) {
-          itemList = [];
-        }
+      // items_data.js가 아직 로드되지 않았다면 50ms 후 재시도
+      if (!window.DEFAULT_ITEMS || window.DEFAULT_ITEMS.length === 0) {
+        setTimeout(initApp, 50);
+        return;
       }
 
+      itemList = JSON.parse(JSON.stringify(window.DEFAULT_ITEMS));
       updateTextarea();
 
-      // 공유 링크인지 먼저 판별
+      // 데이터가 완벽히 들어온 상태에서 공유 링크 파싱
       const isLoadedFromShare = checkSharedUrl();
 
-      // 공유 링크가 아닐 때만 기본 선택 및 자동 선택 수행
+      // 공유 링크가 아닐 때만 기본 선택 수행
       if (!isLoadedFromShare) {
         renderItemPool();
         autoSelectItems();
       }
+    }
+
+    // URL 해시가 변경될 때도 즉시 반영
+    window.addEventListener("hashchange", () => {
+      if (itemList.length > 0) {
+        checkSharedUrl();
+      }
+    });
+
+    // DOM 로드 완료 후 실행
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
     }
 
     function reloadDefaultJson() {
