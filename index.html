@@ -75,6 +75,32 @@
       color: #ffffff;
     }
 
+    /* 접을 수 있는 아코디언 스타일 */
+    details.custom-accordion {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+    }
+
+    details.custom-accordion summary {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #334155;
+      cursor: pointer;
+      user-select: none;
+      outline: none;
+    }
+
+    details.custom-accordion summary:hover {
+      color: #2563eb;
+    }
+
+    .accordion-content {
+      margin-top: 10px;
+    }
+
     textarea {
       width: 100%;
       height: 90px;
@@ -85,6 +111,7 @@
       resize: vertical;
       outline: none;
       font-family: monospace;
+      background: #ffffff;
     }
     textarea:focus {
       border-color: #2563eb;
@@ -335,19 +362,24 @@
       </div>
     </div>
 
-    <!-- 2. 단어 + 이미지 데이터 관리 -->
+    <!-- 2. 단어 풀 선택 및 관리 -->
     <div class="section">
-      <div class="section-title">
-        <span>2. 단어 & 이미지 목록 (단어 | 이미지URL)</span>
-        <button class="link-btn" onclick="reloadDefaultJson()">기본 items.json으로 새로고침</button>
-      </div>
-      <textarea id="customInput" placeholder="단어 | 이미지URL 형식으로 한 줄씩 입력하세요."></textarea>
-      <div style="display: flex; gap: 8px; margin-top: 8px;">
-        <button class="action-btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;" onclick="saveCustomItems()">목록 적용 & 저장</button>
-      </div>
+      <!-- 기본 접힘 처리된 데이터 수동 관리 영역 -->
+      <details class="custom-accordion">
+        <summary>⚙️ 단어 & 이미지 데이터 직접 관리 (클릭하여 열기)</summary>
+        <div class="accordion-content">
+          <div style="display: flex; justify-content: flex-end; margin-bottom: 6px;">
+            <button class="link-btn" onclick="reloadDefaultJson()">기본 items.json으로 새로고침</button>
+          </div>
+          <textarea id="customInput" placeholder="단어 | 이미지URL 형식으로 한 줄씩 입력하세요."></textarea>
+          <div style="display: flex; gap: 8px; margin-top: 8px;">
+            <button class="action-btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;" onclick="saveCustomItems()">목록 적용 & 저장</button>
+          </div>
+        </div>
+      </details>
 
-      <div class="section-title" style="margin-top: 16px;">
-        <span>빙고판에 넣을 아이템 선택</span>
+      <div class="section-title" style="margin-top: 10px;">
+        <span>2. 빙고판에 넣을 아이템 선택</span>
         <span class="badge" id="selectionCount">선택: 0 / 25</span>
       </div>
 
@@ -397,7 +429,6 @@
     let currentBoard = [];
     let currentFilter = "";
     
-    // 배치 수정용 상태
     let isEditMode = false;
     let selectedSwapIndex = null;
     let draggedIndex = null;
@@ -569,10 +600,8 @@
       }
     }
 
-    // 신규 게임 생성
     function generateNewGame() {
       const chosenItems = Array.from(selectedIndices).map(idx => itemList[idx]);
-      // 무작위 셔플
       chosenItems.sort(() => 0.5 - Math.random());
       currentBoard = chosenItems.map(item => ({ ...item, selected: false }));
       
@@ -582,14 +611,12 @@
       updateScore();
     }
 
-    // 현재 선택된 칸들만 다시 셔플
     function shuffleCurrentBoard() {
       currentBoard.sort(() => 0.5 - Math.random());
       renderGameBoard();
       updateScore();
     }
 
-    // 편집 모드 토글
     function toggleEditMode() {
       isEditMode = !isEditMode;
       selectedSwapIndex = null;
@@ -599,7 +626,6 @@
       renderGameBoard();
     }
 
-    // 두 칸 위치 스왑
     function swapCells(idx1, idx2) {
       const temp = currentBoard[idx1];
       currentBoard[idx1] = currentBoard[idx2];
@@ -618,7 +644,6 @@
         const cell = document.createElement("div");
         cell.className = `cell ${!isEditMode && item.selected ? "selected" : ""} ${selectedSwapIndex === index ? "edit-source" : ""}`;
         
-        // 드래그 앤 드롭 속성 (편집 모드 시)
         if (isEditMode) {
           cell.draggable = true;
           cell.title = "드래그하거나 클릭하여 자리를 바꿀 수 있습니다.";
@@ -651,7 +676,6 @@
 
         cell.onclick = () => {
           if (isEditMode) {
-            // 편집 모드: 클릭으로 교환 (첫 번째 칸 선택 -> 두 번째 칸 선택 시 스왑)
             if (selectedSwapIndex === null) {
               selectedSwapIndex = index;
               renderGameBoard();
@@ -662,7 +686,6 @@
               swapCells(selectedSwapIndex, index);
             }
           } else {
-            // 플레이 모드: 체크 토글
             currentBoard[index].selected = !currentBoard[index].selected;
             renderGameBoard();
             updateScore();
@@ -688,11 +711,9 @@
       let lines = 0;
       const n = currentSize;
 
-      // 가로
       for (let r = 0; r < n; r++) {
         if (currentBoard.slice(r * n, (r + 1) * n).every(c => c.selected)) lines++;
       }
-      // 세로
       for (let c = 0; c < n; c++) {
         let full = true;
         for (let r = 0; r < n; r++) {
@@ -700,14 +721,12 @@
         }
         if (full) lines++;
       }
-      // 대각선 (좌상->우하)
       let d1 = true;
       for (let i = 0; i < n; i++) {
         if (!currentBoard[i * n + i].selected) { d1 = false; break; }
       }
       if (d1) lines++;
 
-      // 대각선 (우상->좌하)
       let d2 = true;
       for (let i = 0; i < n; i++) {
         if (!currentBoard[i * n + (n - 1 - i)].selected) { d2 = false; break; }
@@ -717,7 +736,6 @@
       return lines;
     }
 
-    // 현재 사용자가 직접 배치한 순서 그대로 공유 URL 생성
     function copyShareUrl() {
       const chosenItems = currentBoard.map(b => ({ word: b.word, img: b.img }));
       const payload = {
