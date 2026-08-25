@@ -31,478 +31,160 @@
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
     }
 
-    .title-input-wrap {
-      margin-bottom: 20px;
+    /* 뷰 전환용 클래스 */
+    #setupView, #gameView {
+      display: none; /* JS에서 제어 */
     }
 
+    .title-input-wrap { margin-bottom: 20px; }
     .title-input-wrap label {
-      display: block;
-      font-size: 0.9rem;
-      font-weight: 700;
-      margin-bottom: 6px;
-      color: #334155;
+      display: block; font-size: 0.9rem; font-weight: 700; margin-bottom: 6px; color: #334155;
     }
-
     .title-input {
-      width: 100%;
-      padding: 10px 14px;
-      border: 2px solid #cbd5e1;
-      border-radius: 8px;
-      font-size: 1.1rem;
-      font-weight: 700;
-      outline: none;
-      color: #0f172a;
+      width: 100%; padding: 10px 14px; border: 2px solid #cbd5e1; border-radius: 8px;
+      font-size: 1.1rem; font-weight: 700; outline: none; color: #0f172a;
     }
-    .title-input:focus {
-      border-color: #2563eb;
-    }
+    .title-input:focus { border-color: #2563eb; }
 
-    .section {
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid #e2e8f0;
-    }
+    .section { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0; }
+    .section-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
 
-    .section-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+    .size-selector { display: flex; gap: 8px; }
+    .size-btn { flex: 1; padding: 10px; background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 8px; font-weight: 600; cursor: pointer; color: #475569; }
+    .size-btn.active { background: #2563eb; border-color: #2563eb; color: #ffffff; }
 
-    .size-selector {
-      display: flex;
-      gap: 8px;
-    }
+    details.custom-accordion { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; }
+    details.custom-accordion summary { font-size: 0.9rem; font-weight: 700; color: #334155; cursor: pointer; user-select: none; outline: none; }
+    .accordion-content { margin-top: 10px; }
 
-    .size-btn {
-      flex: 1;
-      padding: 10px;
-      background: #f8fafc;
-      border: 2px solid #cbd5e1;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      color: #475569;
-    }
+    textarea { width: 100%; height: 90px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.85rem; resize: vertical; outline: none; font-family: monospace; background: #ffffff; }
+    textarea:focus { border-color: #2563eb; }
 
-    .size-btn.active {
-      background: #2563eb;
-      border-color: #2563eb;
-      color: #ffffff;
-    }
+    .search-input { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; margin-top: 8px; }
+    .search-input:focus { border-color: #2563eb; }
 
-    details.custom-accordion {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 10px 12px;
-      margin-bottom: 14px;
-    }
+    .word-pool { display: flex; flex-wrap: wrap; gap: 8px; max-height: 200px; overflow-y: auto; padding: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 8px; }
+    .pool-chip { display: flex; align-items: center; gap: 6px; padding: 4px 10px 4px 4px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer; user-select: none; transition: all 0.15s ease; }
+    .pool-chip img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+    .pool-chip.checked { background: #eff6ff; border-color: #3b82f6; color: #1d4ed8; font-weight: 700; }
 
-    details.custom-accordion summary {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: #334155;
-      cursor: pointer;
-      user-select: none;
-      outline: none;
-    }
+    .badge { font-size: 0.8rem; padding: 3px 8px; border-radius: 12px; background: #f1f5f9; color: #64748b; }
+    .badge.ready { background: #dcfce7; color: #15803d; font-weight: 700; }
 
-    .accordion-content {
-      margin-top: 10px;
-    }
+    /* 게임 화면 전용 UI */
+    .game-main-title { font-size: 1.4rem; font-weight: 800; text-align: center; color: #0f172a; margin-bottom: 20px; word-break: keep-all;}
+    
+    .criteria-box { background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+    .criteria-label { font-size: 0.85rem; font-weight: 700; color: #475569; margin-bottom: 8px; }
+    .radio-group { display: flex; gap: 12px; }
+    .radio-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 12px; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; font-size: 0.88rem; font-weight: 600; transition: all 0.15s ease; }
+    .radio-btn input { display: none; }
+    .radio-btn.active { background: #eff6ff; border-color: #2563eb; color: #1d4ed8; font-weight: 700; }
 
-    textarea {
-      width: 100%;
-      height: 90px;
-      padding: 10px;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      resize: vertical;
-      outline: none;
-      font-family: monospace;
-      background: #ffffff;
-    }
-    textarea:focus {
-      border-color: #2563eb;
-    }
+    .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .bingo-score { font-size: 1.15rem; font-weight: 700; color: #2563eb; }
 
-    .search-input {
-      width: 100%;
-      padding: 8px 12px;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      outline: none;
-      margin-top: 8px;
-    }
-    .search-input:focus {
-      border-color: #2563eb;
-    }
+    .mode-bar { display: flex; gap: 8px; margin-bottom: 12px; background: #f8fafc; padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0; align-items: center; justify-content: space-between; }
+    .mode-btn { padding: 6px 12px; font-size: 0.85rem; font-weight: 600; border-radius: 6px; border: 1px solid #cbd5e1; background: #ffffff; cursor: pointer; }
+    .mode-btn.active { background: #f59e0b; border-color: #d97706; color: #ffffff; }
 
-    .word-pool {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      max-height: 200px;
-      overflow-y: auto;
-      padding: 10px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      margin-top: 8px;
-    }
+    .grid { display: grid; gap: 6px; margin-bottom: 16px; }
+    .cell { position: relative; aspect-ratio: 1; background-color: #ffffff; border: 2px solid #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 4px; cursor: pointer; overflow: hidden; user-select: none; transition: all 0.15s ease; }
+    .cell:hover { border-color: #94a3b8; }
+    .cell.edit-source { border-color: #f59e0b !important; transform: scale(0.95); background-color: #fef3c7; }
+    .cell.drag-over { border: 2px dashed #f59e0b !important; }
+    .cell img { width: 100%; height: 60%; object-fit: cover; border-radius: 4px; pointer-events: none; }
 
-    .pool-chip {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px 4px 4px;
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      user-select: none;
-      transition: all 0.15s ease;
-    }
+    .caption-badge { position: absolute; top: 4px; right: 4px; font-size: 0.65rem; font-weight: 800; padding: 1px 6px; border-radius: 4px; z-index: 2; pointer-events: none; line-height: 1.2; color: #ffffff; }
+    .caption-badge.type-star { background: rgba(202, 138, 4, 0.9); }
+    .caption-badge.type-weapon { background: rgba(8, 145, 178, 0.9); }
+    .caption-badge.type-none { background: rgba(15, 23, 42, 0.85); }
+    .cell-caption-input { position: absolute; top: 3px; left: 3px; right: 3px; z-index: 10; font-size: 0.72rem; padding: 3px 4px; border: 2px solid #f59e0b; border-radius: 4px; background: #ffffff; text-align: center; font-weight: 700; outline: none; color: #0f172a; }
+    .cell .word-label { font-size: 0.75rem; font-weight: 700; color: #1e293b; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; margin-top: 2px; }
 
-    .pool-chip img {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
+    .cell.checked-star { border: 3.5px solid #eab308 !important; background-color: #fefce8; box-shadow: inset 0 0 8px rgba(234, 179, 8, 0.15); }
+    .cell.checked-weapon { border: 3.5px solid #06b6d4 !important; background-color: #ecfeff; box-shadow: inset 0 0 8px rgba(6, 182, 212, 0.2); }
 
-    .pool-chip.checked {
-      background: #eff6ff;
-      border-color: #3b82f6;
-      color: #1d4ed8;
-      font-weight: 700;
-    }
+    .help-hint { font-size: 0.8rem; color: #64748b; margin-bottom: 8px; text-align: center; }
 
-    .badge {
-      font-size: 0.8rem;
-      padding: 3px 8px;
-      border-radius: 12px;
-      background: #f1f5f9;
-      color: #64748b;
-    }
-
-    .badge.ready {
-      background: #dcfce7;
-      color: #15803d;
-      font-weight: 700;
-    }
-
-    .criteria-box {
-      background: #f8fafc;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 12px;
-    }
-
-    .criteria-label {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #475569;
-      margin-bottom: 8px;
-    }
-
-    .radio-group {
-      display: flex;
-      gap: 12px;
-    }
-
-    .radio-btn {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 8px 12px;
-      background: #ffffff;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.88rem;
-      font-weight: 600;
-      transition: all 0.15s ease;
-    }
-
-    .radio-btn input {
-      display: none;
-    }
-
-    .radio-btn.active {
-      background: #eff6ff;
-      border-color: #2563eb;
-      color: #1d4ed8;
-      font-weight: 700;
-    }
-
-    .game-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .bingo-score {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #2563eb;
-    }
-
-    .mode-bar {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-      background: #f8fafc;
-      padding: 8px;
-      border-radius: 8px;
-      border: 1px solid #e2e8f0;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .mode-btn {
-      padding: 6px 12px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      border-radius: 6px;
-      border: 1px solid #cbd5e1;
-      background: #ffffff;
-      cursor: pointer;
-    }
-
-    .mode-btn.active {
-      background: #f59e0b;
-      border-color: #d97706;
-      color: #ffffff;
-    }
-
-    .grid {
-      display: grid;
-      gap: 6px;
-      margin-bottom: 16px;
-    }
-
-    .cell {
-      position: relative;
-      aspect-ratio: 1;
-      background-color: #ffffff;
-      border: 2px solid #cbd5e1;
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      padding: 4px;
-      cursor: pointer;
-      overflow: hidden;
-      user-select: none;
-      transition: all 0.15s ease;
-    }
-
-    .cell:hover {
-      border-color: #94a3b8;
-    }
-
-    .cell.edit-source {
-      border-color: #f59e0b !important;
-      transform: scale(0.95);
-      background-color: #fef3c7;
-    }
-
-    .cell.drag-over {
-      border: 2px dashed #f59e0b !important;
-    }
-
-    .cell img {
-      width: 100%;
-      height: 60%;
-      object-fit: cover;
-      border-radius: 4px;
-      pointer-events: none;
-    }
-
-    .caption-badge {
-      position: absolute;
-      top: 4px;
-      right: 4px;
-      font-size: 0.65rem;
-      font-weight: 800;
-      padding: 1px 6px;
-      border-radius: 4px;
-      z-index: 2;
-      pointer-events: none;
-      line-height: 1.2;
-      color: #ffffff;
-    }
-    .caption-badge.type-star {
-      background: rgba(202, 138, 4, 0.9);
-    }
-    .caption-badge.type-weapon {
-      background: rgba(8, 145, 178, 0.9);
-    }
-    .caption-badge.type-none {
-      background: rgba(15, 23, 42, 0.85);
-    }
-
-    .cell-caption-input {
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      right: 3px;
-      z-index: 10;
-      font-size: 0.72rem;
-      padding: 3px 4px;
-      border: 2px solid #f59e0b;
-      border-radius: 4px;
-      background: #ffffff;
-      text-align: center;
-      font-weight: 700;
-      outline: none;
-      color: #0f172a;
-    }
-
-    .cell .word-label {
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #1e293b;
-      text-align: center;
-      width: 100%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      line-height: 1.2;
-      margin-top: 2px;
-    }
-
-    .cell.checked-star {
-      border: 3.5px solid #eab308 !important;
-      background-color: #fefce8;
-      box-shadow: inset 0 0 8px rgba(234, 179, 8, 0.15);
-    }
-
-    .cell.checked-weapon {
-      border: 3.5px solid #06b6d4 !important;
-      background-color: #ecfeff;
-      box-shadow: inset 0 0 8px rgba(6, 182, 212, 0.2);
-    }
-
-    .help-hint {
-      font-size: 0.8rem;
-      color: #64748b;
-      margin-bottom: 8px;
-      text-align: center;
-    }
-
-    .btn-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    button.action-btn {
-      width: 100%;
-      padding: 12px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.15s ease;
-    }
-
+    .btn-group { display: flex; flex-direction: column; gap: 8px; }
+    button.action-btn { width: 100%; padding: 12px; font-size: 0.95rem; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.15s ease; }
     .btn-primary { background-color: #2563eb; color: white; }
     .btn-primary:hover { background-color: #1d4ed8; }
     .btn-primary:disabled { background-color: #94a3b8; cursor: not-allowed; }
-
     .btn-share { background-color: #059669; color: white; }
     .btn-share:hover { background-color: #047857; }
-
     .btn-image { background-color: #4f46e5; color: white; }
     .btn-image:hover { background-color: #4338ca; }
-
     .btn-secondary { background-color: #e2e8f0; color: #334155; }
     .btn-secondary:hover { background-color: #cbd5e1; }
-
-    .link-btn {
-      background: none;
-      border: none;
-      color: #2563eb;
-      font-size: 0.85rem;
-      cursor: pointer;
-      text-decoration: underline;
-    }
+    .link-btn { background: none; border: none; color: #2563eb; font-size: 0.85rem; cursor: pointer; text-decoration: underline; }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <div class="title-input-wrap">
-      <label for="boardTitle">📌 빙고 제목</label>
-      <input type="text" id="boardTitle" class="title-input" value="블루아카이브 인권 캐릭터 빙고" placeholder="빙고판 제목을 입력하세요">
-    </div>
-
-    <!-- 1. 판 크기 선택 -->
-    <div class="section">
-      <div class="section-title">1. 빙고판 크기 선택</div>
-      <div class="size-selector">
-        <button class="size-btn" onclick="changeSize(4)">4 x 4 (16칸)</button>
-        <button class="size-btn active" onclick="changeSize(5)">5 x 5 (25칸)</button>
-        <button class="size-btn" onclick="changeSize(6)">6 x 6 (36칸)</button>
+    
+    <!-- ========================================== -->
+    <!-- [STATE 1] 설정 뷰 (링크 파라미터가 없을 때) -->
+    <!-- ========================================== -->
+    <div id="setupView">
+      <div class="title-input-wrap">
+        <label for="boardTitle">📌 빙고 제목</label>
+        <input type="text" id="boardTitle" class="title-input" value="블루아카이브 인권 캐릭터 빙고" placeholder="빙고판 제목을 입력하세요">
       </div>
-    </div>
 
-    <!-- 2. 단어 풀 관리 및 선택 -->
-    <div class="section">
-      <details class="custom-accordion">
-        <summary>⚙️ 단어 & 이미지 데이터 직접 관리 (클릭하여 열기)</summary>
-        <div class="accordion-content">
-          <div style="display: flex; justify-content: flex-end; margin-bottom: 6px;">
-            <button class="link-btn" onclick="reloadDefaultJson()">기본값으로 새로고침</button>
-          </div>
-          <textarea id="customInput" placeholder="단어 | 이미지URL | 약칭 형식으로 한 줄씩 입력하세요."></textarea>
-          <div style="display: flex; gap: 8px; margin-top: 8px;">
-            <button class="action-btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;" onclick="saveCustomItems()">목록 적용 & 저장</button>
-          </div>
+      <div class="section">
+        <div class="section-title">1. 빙고판 크기 선택</div>
+        <div class="size-selector">
+          <button class="size-btn" onclick="changeSize(4)">4 x 4 (16칸)</button>
+          <button class="size-btn active" onclick="changeSize(5)">5 x 5 (25칸)</button>
+          <button class="size-btn" onclick="changeSize(6)">6 x 6 (36칸)</button>
         </div>
-      </details>
-
-      <div class="section-title" style="margin-top: 10px;">
-        <span>2. 빙고판에 넣을 학생 선택</span>
-        <span class="badge" id="selectionCount">선택: 0 / 25</span>
       </div>
 
-      <input type="text" id="searchInput" class="search-input" placeholder="🔍 학생 이름 검색..." oninput="handleSearch()">
-      <div class="word-pool" id="itemPool"></div>
-      
-      <div style="margin-top: 8px; display: flex; justify-content: flex-end; gap: 12px;">
-        <button class="link-btn" onclick="selectAllItems()">전체 선택</button>
-        <button class="link-btn" onclick="clearSelectedItems()">선택 해제</button>
-        <button class="link-btn" onclick="autoSelectItems()">필요한 만큼 자동 선택</button>
-      </div>
-    </div>
+      <div class="section">
+        <details class="custom-accordion">
+          <summary>⚙️ 단어 & 이미지 데이터 직접 관리 (클릭하여 열기)</summary>
+          <div class="accordion-content">
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 6px;">
+              <button class="link-btn" onclick="reloadDefaultJson()">기본값으로 새로고침</button>
+            </div>
+            <textarea id="customInput" placeholder="단어 | 이미지URL | 약칭 형식으로 한 줄씩 입력하세요."></textarea>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <button class="action-btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;" onclick="saveCustomItems()">목록 적용 & 저장</button>
+            </div>
+          </div>
+        </details>
 
-    <!-- 3. 생성 버튼 -->
-    <div class="section" style="border-bottom: none; margin-bottom: 0;">
+        <div class="section-title" style="margin-top: 10px;">
+          <span>2. 빙고판에 넣을 학생 선택</span>
+          <span class="badge" id="selectionCount">선택: 0 / 25</span>
+        </div>
+
+        <input type="text" id="searchInput" class="search-input" placeholder="🔍 학생 이름 검색..." oninput="handleSearch()">
+        <div class="word-pool" id="itemPool"></div>
+        
+        <div style="margin-top: 8px; display: flex; justify-content: flex-end; gap: 12px;">
+          <button class="link-btn" onclick="selectAllItems()">전체 선택</button>
+          <button class="link-btn" onclick="clearSelectedItems()">선택 해제</button>
+          <button class="link-btn" onclick="autoSelectItems()">필요한 만큼 자동 선택</button>
+        </div>
+      </div>
+
       <div class="btn-group">
         <button class="action-btn btn-primary" id="btnGenerate" onclick="generateNewGame()" disabled>새 빙고판 생성하기</button>
       </div>
     </div>
 
-    <!-- 4. 게임 영역 -->
-    <div id="gameArea" style="display: none; margin-top: 10px;">
-      
+
+    <!-- ========================================== -->
+    <!-- [STATE 2] 게임 뷰 (링크 파라미터가 있을 때) -->
+    <!-- ========================================== -->
+    <div id="gameView">
+      <!-- 렌더링된 제목 표시 영역 -->
+      <h2 id="gameTitleDisplay" class="game-main-title">블루아카이브 인권 캐릭터 빙고</h2>
+
       <div class="criteria-box">
         <div class="criteria-label">빙고 유형 선택</div>
         <div class="radio-group">
@@ -525,17 +207,20 @@
       <div class="help-hint">💡 칸을 클릭하여 해당 캐릭터 보유/달성 상태를 체크/해제합니다.</div>
 
       <div class="mode-bar">
-        <button class="mode-btn" id="btnEditMode" onclick="toggleEditMode()">✏️ 빙고배치/육성상태(3성, 전2 등) 수정</button>
-        <button class="action-btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onclick="shuffleCurrentBoard()">🔀 랜덤 배치</button>
+        <button class="mode-btn" id="btnEditMode" onclick="toggleEditMode()">✏️ 빙고배치/조건 수정</button>
+        <button class="action-btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onclick="shuffleCurrentBoard()">🔀 랜덤 섞기</button>
       </div>
       
       <div class="grid" id="board"></div>
 
       <div class="btn-group">
-        <button class="action-btn btn-share" id="btnShare" onclick="copyShareUrl()">🔗 현재 빙고판 공유 링크 복사</button>
+        <button class="action-btn btn-share" onclick="copyShareUrl(false)">🔗 현재 빙고판 공유 링크 복사</button>
         <button class="action-btn btn-image" onclick="exportAsImage()">📸 빙고 결과 이미지로 저장 (PNG)</button>
+        <!-- 설정 창으로 돌아가기 -->
+        <button class="action-btn btn-secondary" style="margin-top: 12px;" onclick="goToSetupView()">⚙️ 내 빙고판 새로 만들기 (학생/크기 변경)</button>
       </div>
     </div>
+
   </div>
 
   <script src="./items_data.js"></script>
@@ -551,90 +236,70 @@
     let selectedSwapIndex = null;
     let draggedIndex = null;
 
+    // ==========================================
+    // 앱 초기화 및 화면 전환 로직 (if/else 명확히 분리)
+    // ==========================================
     function initApp() {
-      // items_data.js가 메모리에 완전히 준비될 때까지 안전 대기
+      // 1. 데이터 로드 대기
       if (typeof window.DEFAULT_ITEMS === "undefined" || !window.DEFAULT_ITEMS || window.DEFAULT_ITEMS.length === 0) {
         setTimeout(initApp, 50);
         return;
       }
-
       itemList = JSON.parse(JSON.stringify(window.DEFAULT_ITEMS));
       updateTextarea();
 
-      // 공유 링크 우선 확인
-      const isLoadedFromShare = checkSharedUrl();
-
-      // 공유 링크가 없는 일반 접속일 때만 랜덤 25명 선택 및 칩 렌더링
-      if (!isLoadedFromShare) {
-        renderItemPool();
-        autoSelectItems();
-      }
-    }
-
-    function reloadDefaultJson() {
-      if (confirm("기본 데이터로 초기화하시겠습니까?")) {
-        try {
-          localStorage.removeItem("custom_image_bingo_items");
-        } catch(e) {}
-        
-        if (window.DEFAULT_ITEMS && window.DEFAULT_ITEMS.length > 0) {
-          itemList = JSON.parse(JSON.stringify(window.DEFAULT_ITEMS));
+      // 2. URL 해시 체크 (if 링크 뒤에 추가 정보 없음 / else 있음)
+      if (window.location.hash && window.location.hash.length > 1) {
+        // [ELSE] 해당 정보에 맞춰 알맞게 배치된 빙고판 생성
+        const success = parseSharedUrl();
+        if (success) {
+          showGameView();
         } else {
-          itemList = [];
+          showSetupView(); // 파싱 실패 시 설정창 띄움
         }
+      } else {
+        // [IF] 링크 뒤에 추가 정보 없음 -> 빙고판 설정하기 창 등장
+        showSetupView();
+      }
+    }
 
-        updateTextarea();
-        selectedIndices.clear();
-        document.getElementById("searchInput").value = "";
-        currentFilter = "";
-        renderItemPool();
+    function showSetupView() {
+      document.getElementById('setupView').style.display = 'block';
+      document.getElementById('gameView').style.display = 'none';
+      
+      renderItemPool();
+      // 아무것도 선택 안되어있으면 꽉 채움
+      if (selectedIndices.size === 0) {
         autoSelectItems();
       }
     }
 
-    function updateTextarea() {
-      const textarea = document.getElementById("customInput");
-      if (!textarea) return;
-      textarea.value = itemList.map(i => {
-        const word = (i.word || "").trim();
-        const img = (i.img || "").trim();
-        const alias = (i.alias || "").trim();
-        return alias ? `${word} | ${img} | ${alias}` : `${word} | ${img}`;
-      }).join("\n");
+    function showGameView() {
+      document.getElementById('setupView').style.display = 'none';
+      document.getElementById('gameView').style.display = 'block';
     }
 
-    function saveCustomItems() {
-      const text = document.getElementById("customInput").value;
-      const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
-      const parsed = [];
-      
-      lines.forEach(line => {
-        const parts = line.split("|").map(p => p.trim());
-        if (parts.length >= 3) {
-          parsed.push({ word: parts[0], img: parts[1], alias: parts[2] });
-        } else if (parts.length === 2) {
-          parsed.push({ word: parts[0], img: parts[1], alias: "" });
-        } else if (parts.length === 1) {
-          parsed.push({ word: parts[0], img: "", alias: "" });
-        }
+    function goToSetupView() {
+      // URL 클린업 후 설정창으로 
+      history.replaceState(null, "", window.location.pathname);
+      showSetupView();
+    }
+
+
+    // ==========================================
+    // 설정 뷰 (Setup View) 관련 함수들
+    // ==========================================
+    function changeSize(size) {
+      currentSize = size;
+      document.querySelectorAll(".size-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.innerText.includes(`${size} x ${size}`));
       });
-      
-      if (parsed.length < 16) {
-        alert("최소 16개 이상의 캐릭터가 필요합니다.");
-        return;
+      const maxCount = currentSize * currentSize;
+      if (selectedIndices.size > maxCount) {
+        selectedIndices = new Set(Array.from(selectedIndices).slice(0, maxCount));
+        renderItemPool();
       }
-
-      itemList = parsed;
-      try {
-        localStorage.setItem("custom_image_bingo_items", JSON.stringify(itemList));
-      } catch(e) {}
-
-      selectedIndices.clear();
-      document.getElementById("searchInput").value = "";
-      currentFilter = "";
-      renderItemPool();
-      autoSelectItems();
-      alert(`${itemList.length}개의 캐릭터가 적용 및 저장되었습니다.`);
+      updateSelectionUI();
     }
 
     function handleSearch() {
@@ -650,10 +315,7 @@
       itemList.forEach((item, idx) => {
         const wordMatch = item.word.toLowerCase().includes(currentFilter);
         const aliasMatch = item.alias ? item.alias.toLowerCase().includes(currentFilter) : false;
-      
-        if (currentFilter && !wordMatch && !aliasMatch) {
-          return;
-        }
+        if (currentFilter && !wordMatch && !aliasMatch) return;
       
         const chip = document.createElement("div");
         chip.className = `pool-chip ${selectedIndices.has(idx) ? "checked" : ""}`;
@@ -704,20 +366,6 @@
       renderItemPool();
     }
 
-    function changeSize(size) {
-      currentSize = size;
-      document.querySelectorAll(".size-btn").forEach(btn => {
-        btn.classList.toggle("active", btn.innerText.includes(`${size} x ${size}`));
-      });
-
-      const maxCount = currentSize * currentSize;
-      if (selectedIndices.size > maxCount) {
-        selectedIndices = new Set(Array.from(selectedIndices).slice(0, maxCount));
-        renderItemPool();
-      }
-      updateSelectionUI();
-    }
-
     function updateSelectionUI() {
       const target = currentSize * currentSize;
       const countLabel = document.getElementById("selectionCount");
@@ -735,6 +383,66 @@
       }
     }
 
+    // 커스텀 데이터 관리
+    function reloadDefaultJson() {
+      if (confirm("기본 데이터로 초기화하시겠습니까?")) {
+        try { localStorage.removeItem("custom_image_bingo_items"); } catch(e) {}
+        if (window.DEFAULT_ITEMS && window.DEFAULT_ITEMS.length > 0) {
+          itemList = JSON.parse(JSON.stringify(window.DEFAULT_ITEMS));
+        } else { itemList = []; }
+        updateTextarea(); selectedIndices.clear(); document.getElementById("searchInput").value = ""; currentFilter = "";
+        renderItemPool(); autoSelectItems();
+      }
+    }
+    function updateTextarea() {
+      const textarea = document.getElementById("customInput");
+      if (!textarea) return;
+      textarea.value = itemList.map(i => {
+        const word = (i.word || "").trim();
+        const img = (i.img || "").trim();
+        const alias = (i.alias || "").trim();
+        return alias ? `${word} | ${img} | ${alias}` : `${word} | ${img}`;
+      }).join("\n");
+    }
+    function saveCustomItems() {
+      const text = document.getElementById("customInput").value;
+      const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+      const parsed = [];
+      lines.forEach(line => {
+        const parts = line.split("|").map(p => p.trim());
+        if (parts.length >= 3) parsed.push({ word: parts[0], img: parts[1], alias: parts[2] });
+        else if (parts.length === 2) parsed.push({ word: parts[0], img: parts[1], alias: "" });
+        else if (parts.length === 1) parsed.push({ word: parts[0], img: "", alias: "" });
+      });
+      if (parsed.length < 16) { alert("최소 16개 이상의 캐릭터가 필요합니다."); return; }
+      itemList = parsed;
+      try { localStorage.setItem("custom_image_bingo_items", JSON.stringify(itemList)); } catch(e) {}
+      selectedIndices.clear(); document.getElementById("searchInput").value = ""; currentFilter = "";
+      renderItemPool(); autoSelectItems();
+      alert(`${itemList.length}개의 캐릭터가 적용 및 저장되었습니다.`);
+    }
+
+    // 설정 -> 게임화면으로 전환 액션
+    function generateNewGame() {
+      const chosenItems = Array.from(selectedIndices).map(idx => itemList[idx]);
+      chosenItems.sort(() => 0.5 - Math.random());
+      currentBoard = chosenItems.map(item => ({ ...item, caption: "", checked: false }));
+      
+      const title = document.getElementById("boardTitle").value.trim() || "블루아카이브 인권 캐릭터 빙고";
+      document.getElementById("gameTitleDisplay").innerText = title;
+
+      renderGameBoard();
+      updateScore();
+      showGameView();
+      
+      // 새로고침 해도 날아가지 않게 URL 해시에 빙고판 정보 소리없이 저장
+      copyShareUrl(true); 
+    }
+
+
+    // ==========================================
+    // 게임 뷰 (Game View) 관련 함수들
+    // ==========================================
     function setCriteria(mode) {
       currentCriteria = mode;
       document.getElementById("labelOwnership").classList.toggle("active", mode === "ownership");
@@ -744,22 +452,9 @@
 
     function getCaptionType(caption) {
       const cap = (caption || "").trim().toLowerCase();
-      if (/전[1-4]|전무|고유/.test(cap)) {
-        return "weapon";
-      } else if (/[1-5]성|명함/.test(cap)) {
-        return "star";
-      }
+      if (/전[1-4]|전무|고유/.test(cap)) return "weapon";
+      else if (/[1-5]성|명함/.test(cap)) return "star";
       return "none";
-    }
-
-    function generateNewGame() {
-      const chosenItems = Array.from(selectedIndices).map(idx => itemList[idx]);
-      chosenItems.sort(() => 0.5 - Math.random());
-      currentBoard = chosenItems.map(item => ({ ...item, caption: "", checked: false }));
-      
-      renderGameBoard();
-      document.getElementById("gameArea").style.display = "block";
-      updateScore();
     }
 
     function shuffleCurrentBoard() {
@@ -773,7 +468,7 @@
       selectedSwapIndex = null;
       const btn = document.getElementById("btnEditMode");
       btn.classList.toggle("active", isEditMode);
-      btn.innerText = isEditMode ? "수정 완료 (플레이 모드)" : "✏️ 빙고배치/육성상태(3성, 전2 등) 직접 수정";
+      btn.innerText = isEditMode ? "수정 완료 (플레이 모드)" : "✏️ 빙고배치/조건 수정";
       renderGameBoard();
       updateScore();
     }
@@ -806,26 +501,15 @@
         if (isEditMode) {
           cell.draggable = true;
           cell.ondragstart = (e) => {
-            if (e.target.tagName === 'INPUT') {
-              e.preventDefault();
-              return;
-            }
+            if (e.target.tagName === 'INPUT') { e.preventDefault(); return; }
             draggedIndex = index;
             e.dataTransfer.effectAllowed = "move";
           };
-          cell.ondragover = (e) => {
-            e.preventDefault();
-            cell.classList.add("drag-over");
-          };
-          cell.ondragleave = () => {
-            cell.classList.remove("drag-over");
-          };
+          cell.ondragover = (e) => { e.preventDefault(); cell.classList.add("drag-over"); };
+          cell.ondragleave = () => { cell.classList.remove("drag-over"); };
           cell.ondrop = (e) => {
-            e.preventDefault();
-            cell.classList.remove("drag-over");
-            if (draggedIndex !== null && draggedIndex !== index) {
-              swapCells(draggedIndex, index);
-            }
+            e.preventDefault(); cell.classList.remove("drag-over");
+            if (draggedIndex !== null && draggedIndex !== index) swapCells(draggedIndex, index);
           };
         }
 
@@ -838,49 +522,34 @@
           captionHTML = `<div class="caption-badge type-${type}">${item.caption}</div>`;
         }
 
-        cell.innerHTML = `
-          ${captionHTML}
-          ${imgTag}
-          <div class="word-label">${item.word}</div>
-        `;
+        cell.innerHTML = `${captionHTML}${imgTag}<div class="word-label">${item.word}</div>`;
 
         cell.onclick = (e) => {
           if (isEditMode) {
             if (e.target.tagName === 'INPUT') return;
             if (selectedSwapIndex === null) {
-              selectedSwapIndex = index;
-              renderGameBoard();
+              selectedSwapIndex = index; renderGameBoard();
             } else if (selectedSwapIndex === index) {
-              selectedSwapIndex = null;
-              renderGameBoard();
-            } else {
-              swapCells(selectedSwapIndex, index);
-            }
+              selectedSwapIndex = null; renderGameBoard();
+            } else { swapCells(selectedSwapIndex, index); }
           } else {
             currentBoard[index].checked = !currentBoard[index].checked;
-            renderGameBoard();
-            updateScore();
+            renderGameBoard(); updateScore();
           }
         };
-
         boardElement.appendChild(cell);
       });
     }
 
     function resetCheck() {
       currentBoard.forEach(c => c.checked = false);
-      renderGameBoard();
-      updateScore();
+      renderGameBoard(); updateScore();
     }
 
     function isCellValid(item) {
       if (!item.checked) return false;
-
-      if (currentCriteria === "ownership") {
-        return true;
-      } else {
-        return getCaptionType(item.caption) === "weapon";
-      }
+      if (currentCriteria === "ownership") return true;
+      else return getCaptionType(item.caption) === "weapon";
     }
 
     function updateScore() {
@@ -890,37 +559,31 @@
     }
 
     function calculateBingoLines() {
-      let lines = 0;
-      const n = currentSize;
-
-      for (let r = 0; r < n; r++) {
-        if (currentBoard.slice(r * n, (r + 1) * n).every(isCellValid)) lines++;
-      }
+      let lines = 0; const n = currentSize;
+      for (let r = 0; r < n; r++) if (currentBoard.slice(r * n, (r + 1) * n).every(isCellValid)) lines++;
       for (let c = 0; c < n; c++) {
         let full = true;
-        for (let r = 0; r < n; r++) {
-          if (!isCellValid(currentBoard[r * n + c])) { full = false; break; }
-        }
+        for (let r = 0; r < n; r++) if (!isCellValid(currentBoard[r * n + c])) { full = false; break; }
         if (full) lines++;
       }
       let d1 = true;
-      for (let i = 0; i < n; i++) {
-        if (!isCellValid(currentBoard[i * n + i])) { d1 = false; break; }
-      }
+      for (let i = 0; i < n; i++) if (!isCellValid(currentBoard[i * n + i])) { d1 = false; break; }
       if (d1) lines++;
-
       let d2 = true;
-      for (let i = 0; i < n; i++) {
-        if (!isCellValid(currentBoard[i * n + (n - 1 - i)])) { d2 = false; break; }
-      }
+      for (let i = 0; i < n; i++) if (!isCellValid(currentBoard[i * n + (n - 1 - i)])) { d2 = false; break; }
       if (d2) lines++;
-
       return lines;
     }
 
-    // 공유 링크 생성
-    function copyShareUrl() {
-      const rawTitle = document.getElementById("boardTitle").value.trim() || "블루아카이브 인권 캐릭터 빙고";
+    // ==========================================
+    // 링크 공유 & 파싱
+    // ==========================================
+    function copyShareUrl(isSilent = false) {
+      // 뷰에 따라 제목 가져오기 다름 (설정 뷰 vs 게임 뷰)
+      let rawTitle = document.getElementById("gameTitleDisplay").innerText;
+      if(!rawTitle || rawTitle === "") rawTitle = document.getElementById("boardTitle").value.trim();
+      if(!rawTitle) rawTitle = "블루아카이브 인권 캐릭터 빙고";
+
       const title = encodeURIComponent(rawTitle);
       const size = currentSize;
       const mode = currentCriteria;
@@ -931,28 +594,21 @@
         return b.caption ? `${idx}:${encodeURIComponent(b.caption)}` : `${idx}`;
       }).join(",");
 
-      const hashString = `title=${title}&size=${size}&mode=${mode}&items=${itemTokens}`;
+      const hashString = `title=${title}&size=${size}&mode=${mode}&items=${itemTokens}&ts=${Date.now()}`;
       const shareUrl = `${window.location.origin}${window.location.pathname}#${hashString}`;
 
-      try {
-        history.replaceState(null, "", `#${hashString}`);
-      } catch (e) {}
+      try { history.replaceState(null, "", `#${hashString}`); } catch (e) {}
 
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(shareUrl).then(() => {
-          alert("현재 빙고판 링크가 복사되었습니다!");
-        }).catch(() => {
+      if (!isSilent) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(shareUrl).then(() => { alert("현재 빙고판 링크가 복사되었습니다!"); }).catch(() => { prompt("아래 링크를 복사하세요:", shareUrl); });
+        } else {
           prompt("아래 링크를 복사하세요:", shareUrl);
-        });
-      } else {
-        prompt("아래 링크를 복사하세요:", shareUrl);
+        }
       }
     }
 
-    // 공유 링크 파싱 (접속 즉시 상단 설정 숨기고 빙고판 맨 위에 노출)
-    function checkSharedUrl() {
-      if (!window.location.hash || window.location.hash.length <= 1) return false;
-
+    function parseSharedUrl() {
       try {
         const rawHash = window.location.hash.substring(1);
         const params = new URLSearchParams(rawHash);
@@ -964,9 +620,10 @@
 
         if (!itemsStr) return false;
 
-        if (title) {
-          document.getElementById("boardTitle").value = decodeURIComponent(title);
-        }
+        // 게임 뷰 타이틀 셋업
+        const decodedTitle = title ? decodeURIComponent(title) : "블루아카이브 인권 캐릭터 빙고";
+        document.getElementById("gameTitleDisplay").innerText = decodedTitle;
+        document.getElementById("boardTitle").value = decodedTitle; // 설정창 동기화
 
         if (size) {
           currentSize = size;
@@ -974,10 +631,7 @@
             btn.classList.toggle("active", btn.innerText.includes(`${size} x ${size}`));
           });
         }
-
-        if (mode) {
-          setCriteria(mode);
-        }
+        if (mode) setCriteria(mode);
 
         const tokens = itemsStr.split(",");
         if (tokens.length === currentSize * currentSize) {
@@ -986,10 +640,7 @@
           currentBoard = tokens.map(token => {
             const [idxStr, capStr] = token.split(":");
             const idx = parseInt(idxStr, 10);
-            
-            if (!isNaN(idx) && idx >= 0 && idx < itemList.length) {
-              selectedIndices.add(idx);
-            }
+            if (!isNaN(idx) && idx >= 0 && idx < itemList.length) selectedIndices.add(idx);
 
             const student = itemList[idx] || { word: "알 수 없음", img: "" };
             return {
@@ -1000,30 +651,24 @@
             };
           });
 
-          // 1. 링크 접속 시 혼선을 주는 상단 설정창(선택 풀, 생성 버튼)을 완전히 숨김
-          document.querySelectorAll(".section").forEach(el => el.style.display = "none");
-
-          // 2. 빙고판을 최상단에 즉시 렌더링 및 노출
+          // 게임 뷰 렌더링 준비
           renderGameBoard();
-          const gameArea = document.getElementById("gameArea");
-          gameArea.style.display = "block";
           updateScore();
-
-          return true;
+          return true; // 파싱 성공
         }
-      } catch (e) {
-        console.error("공유 링크 파싱 오류:", e);
-      }
-      return false;
+      } catch (e) { console.error("공유 링크 파싱 오류:", e); }
+      return false; // 파싱 실패
     }
 
+    // ==========================================
+    // 이미지 저장
+    // ==========================================
     async function exportAsImage() {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
       const dpr = 2;
 
-      const rawTitle = document.getElementById("boardTitle").value.trim();
-      const title = rawTitle || "블루아카이브 인권 빙고";
+      const rawTitle = document.getElementById("gameTitleDisplay").innerText || "블루아카이브 인권 빙고";
       
       const width = 640;
       const padding = 20;
@@ -1044,7 +689,7 @@
       ctx.fillStyle = "#0f172a";
       ctx.font = "bold 20px -apple-system, sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText(title, width / 2, 38);
+      ctx.fillText(rawTitle, width / 2, 38);
 
       const criteriaName = currentCriteria === "ownership" ? "단순 보유 기준" : "전용무기 기준";
       ctx.fillStyle = "#2563eb";
@@ -1078,29 +723,17 @@
         let lineWidth = 2;
 
         if (item.checked) {
-          if (type === "weapon") {
-            bgColor = "#ecfeff";
-            strokeColor = "#0891b2";
-            lineWidth = 3.5;
-          } else {
-            bgColor = "#fefce8";
-            strokeColor = "#eab308";
-            lineWidth = 3.5;
-          }
+          if (type === "weapon") { bgColor = "#ecfeff"; strokeColor = "#0891b2"; lineWidth = 3.5; }
+          else { bgColor = "#fefce8"; strokeColor = "#eab308"; lineWidth = 3.5; }
         }
 
         ctx.fillStyle = bgColor;
         ctx.strokeStyle = strokeColor;
         ctx.lineWidth = lineWidth;
         ctx.beginPath();
-        if (typeof ctx.roundRect === "function") {
-          ctx.roundRect(x, y, cellSize, cellSize, 8);
-        } else {
-          ctx.rect(x, y, cellSize, cellSize);
-        }
-        ctx.fill();
-        ctx.stroke();
-        ctx.clip();
+        if (typeof ctx.roundRect === "function") ctx.roundRect(x, y, cellSize, cellSize, 8);
+        else ctx.rect(x, y, cellSize, cellSize);
+        ctx.fill(); ctx.stroke(); ctx.clip();
 
         const loadedImg = loadedImages[index];
         const imgAreaHeight = cellSize * 0.62;
@@ -1111,22 +744,11 @@
         if (loadedImg) {
           const nw = loadedImg.naturalWidth || loadedImg.width;
           const nh = loadedImg.naturalHeight || loadedImg.height;
-          
           let sx = 0, sy = 0, sw = nw, sh = nh;
           const aspect = renderW / renderH;
-          if (nw / nh > aspect) {
-            sw = nh * aspect;
-            sx = (nw - sw) / 2;
-          } else {
-            sh = nw / aspect;
-            sy = (nh - sh) / 2;
-          }
-
-          ctx.drawImage(
-            loadedImg, 
-            sx, sy, sw, sh, 
-            x + imgPadding, y + imgPadding, renderW, renderH
-          );
+          if (nw / nh > aspect) { sw = nh * aspect; sx = (nw - sw) / 2; }
+          else { sh = nw / aspect; sy = (nh - sh) / 2; }
+          ctx.drawImage(loadedImg, sx, sy, sw, sh, x + imgPadding, y + imgPadding, renderW, renderH);
         }
 
         if (item.caption) {
@@ -1136,20 +758,14 @@
           const bgH = 16;
           const bx = x + cellSize - bgW - 4;
           const by = y + 4;
-
           let badgeBg = "rgba(15, 23, 42, 0.85)";
           if (type === "weapon") badgeBg = "rgba(8, 145, 178, 0.9)";
           if (type === "star") badgeBg = "rgba(202, 138, 4, 0.9)";
-
           ctx.fillStyle = badgeBg;
           ctx.beginPath();
-          if (typeof ctx.roundRect === "function") {
-            ctx.roundRect(bx, by, bgW, bgH, 4);
-          } else {
-            ctx.rect(bx, by, bgW, bgH);
-          }
+          if (typeof ctx.roundRect === "function") ctx.roundRect(bx, by, bgW, bgH, 4);
+          else ctx.rect(bx, by, bgW, bgH);
           ctx.fill();
-
           ctx.fillStyle = "#ffffff";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
@@ -1166,7 +782,7 @@
       });
 
       const dateStr = new Date().toISOString().slice(0, 10);
-      const sanitizedTitle = title.replace(/[\\/:*?"<>|]/g, "").replace(/\s+/g, "_");
+      const sanitizedTitle = rawTitle.replace(/[\\/:*?"<>|]/g, "").replace(/\s+/g, "_");
       const fileName = `${sanitizedTitle}_${dateStr}.png`;
 
       const link = document.createElement("a");
@@ -1175,9 +791,12 @@
       link.click();
     }
 
+    // 뒤로가기/해시 변경 이벤트에도 대응
     window.addEventListener("hashchange", () => {
-      if (itemList.length > 0) {
-        checkSharedUrl();
+      if (window.location.hash && window.location.hash.length > 1) {
+        if(parseSharedUrl()) showGameView();
+      } else {
+        showSetupView();
       }
     });
 
