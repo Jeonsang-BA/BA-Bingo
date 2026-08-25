@@ -173,6 +173,34 @@
       color: #2563eb;
     }
 
+    .mode-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      background: #f8fafc;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mode-btn {
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      cursor: pointer;
+    }
+
+    .mode-btn.active {
+      background: #f59e0b;
+      border-color: #d97706;
+      color: #ffffff;
+    }
+
     .grid {
       display: grid;
       gap: 6px;
@@ -198,6 +226,16 @@
 
     .cell:hover {
       border-color: #94a3b8;
+    }
+
+    .cell.edit-source {
+      border-color: #f59e0b !important;
+      transform: scale(0.95);
+      background-color: #fef3c7;
+    }
+
+    .cell.drag-over {
+      border: 2px dashed #f59e0b !important;
     }
 
     .cell img {
@@ -337,6 +375,12 @@
         <div class="bingo-score" id="bingoScore">완성된 빙고: 0줄</div>
         <button class="action-btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onclick="resetCheck()">체크 초기화</button>
       </div>
+
+      <!-- 배치 편집 도구 바 -->
+      <div class="mode-bar">
+        <button class="mode-btn" id="btnEditMode" onclick="toggleEditMode()">✏️ 배치 직접 바꾸기</button>
+        <button class="action-btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onclick="shuffleCurrentBoard()">🔀 무작위 다시 섞기</button>
+      </div>
       
       <div class="grid" id="board"></div>
 
@@ -351,28 +395,20 @@
     let itemList = [];
     let selectedIndices = new Set();
     let currentBoard = [];
-    let currentSeed = 0;
     let currentFilter = "";
+    
+    // 배치 수정용 상태
+    let isEditMode = false;
+    let selectedSwapIndex = null;
+    let draggedIndex = null;
 
-    function seededRandom(seed) {
-      let m = 0x80000000;
-      let a = 1103515245;
-      let c = 12345;
-      let state = seed ? seed : Math.floor(Math.random() * (m - 1));
-      return function() {
-        state = (a * state + c) % m;
-        return state / (m - 1);
-      };
-    }
-
-    // items.json 파일로부터 데이터 불러오기
     async function fetchDefaultItems() {
       try {
         const response = await fetch("./items.json");
         if (!response.ok) throw new Error("JSON 응답 실패");
         return await response.json();
       } catch (err) {
-        console.warn("items.json 로드 실패 (로컬 file:// 환경이거나 파일 없음):", err);
+        console.warn("items.json 로드 실패:", err);
         return [];
       }
     }
@@ -533,25 +569,43 @@
       }
     }
 
+    // 신규 게임 생성
     function generateNewGame() {
-      currentSeed = Math.floor(Math.random() * 1000000);
       const chosenItems = Array.from(selectedIndices).map(idx => itemList[idx]);
-      setupBoard(chosenItems, currentSize, currentSeed);
-      document.getElementById("btnShare").style.display = "block";
-    }
-
-    function setupBoard(items, size, seed) {
-      const rng = seededRandom(seed);
-      let list = [...items];
-
-      for (let i = list.length - 1; i > 0; i--) {
-        const j = Math.floor(rng() * (i + 1));
-        [list[i], list[j]] = [list[j], list[i]];
-      }
-
-      currentBoard = list.map(item => ({ ...item, selected: false }));
+      // 무작위 셔플
+      chosenItems.sort(() => 0.5 - Math.random());
+      currentBoard = chosenItems.map(item => ({ ...item, selected: false }));
+      
       renderGameBoard();
       document.getElementById("gameArea").style.display = "block";
+      document.getElementById("btnShare").style.display = "block";
+      updateScore();
+    }
+
+    // 현재 선택된 칸들만 다시 셔플
+    function shuffleCurrentBoard() {
+      currentBoard.sort(() => 0.5 - Math.random());
+      renderGameBoard();
+      updateScore();
+    }
+
+    // 편집 모드 토글
+    function toggleEditMode() {
+      isEditMode = !isEditMode;
+      selectedSwapIndex = null;
+      const btn = document.getElementById("btnEditMode");
+      btn.classList.toggle("active", isEditMode);
+      btn.innerText = isEditMode ? "완료 (플레이 모드)" : "✏️ 배치 직접 바꾸기";
+      renderGameBoard();
+    }
+
+    // 두 칸 위치 스왑
+    function swapCells(idx1, idx2) {
+      const temp = currentBoard[idx1];
+      currentBoard[idx1] = currentBoard[idx2];
+      currentBoard[idx2] = temp;
+      selectedSwapIndex = null;
+      renderGameBoard();
       updateScore();
     }
 
@@ -562,8 +616,33 @@
 
       currentBoard.forEach((item, index) => {
         const cell = document.createElement("div");
-        cell.className = `cell ${item.selected ? "selected" : ""}`;
+        cell.className = `cell ${!isEditMode && item.selected ? "selected" : ""} ${selectedSwapIndex === index ? "edit-source" : ""}`;
         
+        // 드래그 앤 드롭 속성 (편집 모드 시)
+        if (isEditMode) {
+          cell.draggable = true;
+          cell.title = "드래그하거나 클릭하여 자리를 바꿀 수 있습니다.";
+
+          cell.ondragstart = (e) => {
+            draggedIndex = index;
+            e.dataTransfer.effectAllowed = "move";
+          };
+          cell.ondragover = (e) => {
+            e.preventDefault();
+            cell.classList.add("drag-over");
+          };
+          cell.ondragleave = () => {
+            cell.classList.remove("drag-over");
+          };
+          cell.ondrop = (e) => {
+            e.preventDefault();
+            cell.classList.remove("drag-over");
+            if (draggedIndex !== null && draggedIndex !== index) {
+              swapCells(draggedIndex, index);
+            }
+          };
+        }
+
         const imgTag = item.img ? `<img src="${item.img}" alt="${item.word}" loading="lazy" crossorigin="anonymous">` : `<div style="height:62%;"></div>`;
         cell.innerHTML = `
           ${imgTag}
@@ -571,10 +650,25 @@
         `;
 
         cell.onclick = () => {
-          currentBoard[index].selected = !currentBoard[index].selected;
-          renderGameBoard();
-          updateScore();
+          if (isEditMode) {
+            // 편집 모드: 클릭으로 교환 (첫 번째 칸 선택 -> 두 번째 칸 선택 시 스왑)
+            if (selectedSwapIndex === null) {
+              selectedSwapIndex = index;
+              renderGameBoard();
+            } else if (selectedSwapIndex === index) {
+              selectedSwapIndex = null;
+              renderGameBoard();
+            } else {
+              swapCells(selectedSwapIndex, index);
+            }
+          } else {
+            // 플레이 모드: 체크 토글
+            currentBoard[index].selected = !currentBoard[index].selected;
+            renderGameBoard();
+            updateScore();
+          }
         };
+
         boardElement.appendChild(cell);
       });
     }
@@ -623,19 +717,19 @@
       return lines;
     }
 
+    // 현재 사용자가 직접 배치한 순서 그대로 공유 URL 생성
     function copyShareUrl() {
       const chosenItems = currentBoard.map(b => ({ word: b.word, img: b.img }));
       const payload = {
         s: currentSize,
-        items: chosenItems,
-        r: currentSeed
+        items: chosenItems
       };
       
       const hashData = btoa(encodeURIComponent(JSON.stringify(payload)));
       const shareUrl = `${window.location.origin}${window.location.pathname}#${hashData}`;
 
       navigator.clipboard.writeText(shareUrl).then(() => {
-        alert("이미지 빙고 링크가 복사되었습니다!");
+        alert("현재 배치된 빙고판 링크가 복사되었습니다!");
       }).catch(() => {
         prompt("아래 링크를 복사하세요:", shareUrl);
       });
@@ -648,11 +742,12 @@
           const payload = JSON.parse(decodeURIComponent(atob(hashData)));
 
           currentSize = payload.s;
-          currentSeed = payload.r;
-
           changeSize(currentSize);
-          setupBoard(payload.items, currentSize, currentSeed);
+          currentBoard = payload.items.map(item => ({ ...item, selected: false }));
+          renderGameBoard();
+          document.getElementById("gameArea").style.display = "block";
           document.getElementById("btnShare").style.display = "block";
+          updateScore();
         } catch (e) {
           console.error("공유 데이터 로드 실패", e);
         }
