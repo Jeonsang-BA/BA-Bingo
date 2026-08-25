@@ -596,59 +596,65 @@
       document.getElementById("customInput").value = itemList.map(i => `${i.word} | ${i.img}`).join("\n");
     }
 
-    function saveCustomItems() {
-      const text = document.getElementById("customInput").value;
-      const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
-      const parsed = [];
-
-      lines.forEach(line => {
-        const parts = line.split("|").map(p => p.trim());
-        if (parts.length >= 2) {
-          parsed.push({ word: parts[0], img: parts[1] });
-        } else if (parts.length === 1) {
-          parsed.push({ word: parts[0], img: "" });
-        }
-      });
-
-      if (parsed.length < 16) {
-        alert("최소 16개 이상의 캐릭터가 필요합니다.");
-        return;
+  function saveCustomItems() {
+    const text = document.getElementById("customInput").value;
+    const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+    const parsed = [];
+  
+    lines.forEach(line => {
+      const parts = line.split("|").map(p => p.trim());
+      if (parts.length >= 3) {
+        parsed.push({ word: parts[0], img: parts[1], alias: parts[2] });
+      } else if (parts.length === 2) {
+        parsed.push({ word: parts[0], img: parts[1], alias: "" });
+      } else if (parts.length === 1) {
+        parsed.push({ word: parts[0], img: "", alias: "" });
       }
+    });
+  
+    if (parsed.length < 16) {
+      alert("최소 16개 이상의 캐릭터가 필요합니다.");
+      return;
+  }
 
-      itemList = parsed;
-      localStorage.setItem("custom_image_bingo_items", JSON.stringify(itemList));
-      selectedIndices.clear();
-      document.getElementById("searchInput").value = "";
-      currentFilter = "";
-      renderItemPool();
-      autoSelectItems();
-      alert(`${itemList.length}개의 캐릭터가 적용 및 저장되었습니다.`);
-    }
+  itemList = parsed;
+  localStorage.setItem("custom_image_bingo_items", JSON.stringify(itemList));
+  selectedIndices.clear();
+  document.getElementById("searchInput").value = "";
+  currentFilter = "";
+  renderItemPool();
+  autoSelectItems();
+  alert(`${itemList.length}개의 캐릭터가 적용 및 저장되었습니다.`);
+}
 
-    function handleSearch() {
+  function handleSearch() {
       currentFilter = document.getElementById("searchInput").value.trim().toLowerCase();
       renderItemPool();
     }
 
-    function renderItemPool() {
-      const container = document.getElementById("itemPool");
-      container.innerHTML = "";
+   function renderItemPool() {
+    const container = document.getElementById("itemPool");
+    container.innerHTML = "";
+    
+    itemList.forEach((item, idx) => {
+      // 본명(word) 또는 약칭(alias)에 검색어가 포함되어 있는지 확인
+      const wordMatch = item.word.toLowerCase().includes(currentFilter);
+      const aliasMatch = item.alias ? item.alias.toLowerCase().includes(currentFilter) : false;
+  
+      if (currentFilter && !wordMatch && !aliasMatch) {
+        return;
+      }
+  
+      const chip = document.createElement("div");
+      chip.className = `pool-chip ${selectedIndices.has(idx) ? "checked" : ""}`;
       
-      itemList.forEach((item, idx) => {
-        if (currentFilter && !item.word.toLowerCase().includes(currentFilter)) {
-          return;
-        }
-
-        const chip = document.createElement("div");
-        chip.className = `pool-chip ${selectedIndices.has(idx) ? "checked" : ""}`;
-        
-        const imgTag = item.img ? `<img src="${item.img}" alt="${item.word}" loading="lazy" onerror="this.style.display='none'">` : "";
-        chip.innerHTML = `${imgTag}<span>${item.word}</span>`;
-        chip.onclick = () => toggleItemSelection(idx, chip);
-        container.appendChild(chip);
-      });
-      updateSelectionUI();
-    }
+      const imgTag = item.img ? `<img src="${item.img}" alt="${item.word}" loading="lazy" onerror="this.style.display='none'">` : "";
+      chip.innerHTML = `${imgTag}<span>${item.word}</span>`;
+      chip.onclick = () => toggleItemSelection(idx, chip);
+      container.appendChild(chip);
+    });
+    updateSelectionUI();
+}
 
     function toggleItemSelection(idx, chipElement) {
       if (selectedIndices.has(idx)) {
