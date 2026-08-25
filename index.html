@@ -493,16 +493,15 @@
       </div>
     </div>
 
-    <!-- 3. 생성 및 공유 -->
+    <!-- 3. 생성 버튼 -->
     <div class="section" style="border-bottom: none; margin-bottom: 0;">
       <div class="btn-group">
         <button class="action-btn btn-primary" id="btnGenerate" onclick="generateNewGame()" disabled>새 빙고판 생성하기</button>
-        <button class="action-btn btn-share" id="btnShare" onclick="copyShareUrl()" style="display: none;">🔗 현재 빙고판 공유 링크 복사</button>
       </div>
     </div>
 
     <!-- 4. 게임 영역 -->
-    <div id="gameArea" style="display: none; margin-top: 20px;">
+    <div id="gameArea" style="display: none; margin-top: 10px;">
       
       <div class="criteria-box">
         <div class="criteria-label">빙고 유형 선택</div>
@@ -533,12 +532,12 @@
       <div class="grid" id="board"></div>
 
       <div class="btn-group">
+        <button class="action-btn btn-share" id="btnShare" onclick="copyShareUrl()">🔗 현재 빙고판 공유 링크 복사</button>
         <button class="action-btn btn-image" onclick="exportAsImage()">📸 빙고 결과 이미지로 저장 (PNG)</button>
       </div>
     </div>
   </div>
 
-  <!-- 데이터 스크립트 연결 -->
   <script src="./items_data.js"></script>
   <script>
     let currentSize = 5;
@@ -552,9 +551,8 @@
     let selectedSwapIndex = null;
     let draggedIndex = null;
 
-    // 1. 앱 실행 진입점
     function initApp() {
-      // items_data.js가 아직 준비되지 않았으면 50ms 대기 후 재시도
+      // items_data.js가 메모리에 완전히 준비될 때까지 안전 대기
       if (typeof window.DEFAULT_ITEMS === "undefined" || !window.DEFAULT_ITEMS || window.DEFAULT_ITEMS.length === 0) {
         setTimeout(initApp, 50);
         return;
@@ -563,9 +561,10 @@
       itemList = JSON.parse(JSON.stringify(window.DEFAULT_ITEMS));
       updateTextarea();
 
-      // 공유 링크가 있는지 확인
+      // 공유 링크 우선 확인
       const isLoadedFromShare = checkSharedUrl();
 
+      // 공유 링크가 없는 일반 접속일 때만 랜덤 25명 선택 및 칩 렌더링
       if (!isLoadedFromShare) {
         renderItemPool();
         autoSelectItems();
@@ -760,7 +759,6 @@
       
       renderGameBoard();
       document.getElementById("gameArea").style.display = "block";
-      document.getElementById("btnShare").style.display = "block";
       updateScore();
     }
 
@@ -775,7 +773,7 @@
       selectedSwapIndex = null;
       const btn = document.getElementById("btnEditMode");
       btn.classList.toggle("active", isEditMode);
-      btn.innerText = isEditMode ? "수정 완료 (플레이 모드)" : "✏️ 배치/조건(3성, 전2 등) 직접 수정";
+      btn.innerText = isEditMode ? "수정 완료 (플레이 모드)" : "✏️ 빙고배치/육성상태(3성, 전2 등) 직접 수정";
       renderGameBoard();
       updateScore();
     }
@@ -920,8 +918,10 @@
       return lines;
     }
 
+    // 공유 링크 생성
     function copyShareUrl() {
-      const title = encodeURIComponent(document.getElementById("boardTitle").value.trim());
+      const rawTitle = document.getElementById("boardTitle").value.trim() || "블루아카이브 인권 캐릭터 빙고";
+      const title = encodeURIComponent(rawTitle);
       const size = currentSize;
       const mode = currentCriteria;
 
@@ -931,7 +931,7 @@
         return b.caption ? `${idx}:${encodeURIComponent(b.caption)}` : `${idx}`;
       }).join(",");
 
-      const hashString = `title=${title}&size=${size}&mode=${mode}&items=${itemTokens}&ts=${Date.now()}`;
+      const hashString = `title=${title}&size=${size}&mode=${mode}&items=${itemTokens}`;
       const shareUrl = `${window.location.origin}${window.location.pathname}#${hashString}`;
 
       try {
@@ -949,6 +949,7 @@
       }
     }
 
+    // 공유 링크 파싱 (접속 즉시 상단 설정 숨기고 빙고판 맨 위에 노출)
     function checkSharedUrl() {
       if (!window.location.hash || window.location.hash.length <= 1) return false;
 
@@ -966,7 +967,7 @@
         if (title) {
           document.getElementById("boardTitle").value = decodeURIComponent(title);
         }
-        
+
         if (size) {
           currentSize = size;
           document.querySelectorAll(".size-btn").forEach(btn => {
@@ -999,14 +1000,14 @@
             };
           });
 
-          renderItemPool();
+          // 1. 링크 접속 시 혼선을 주는 상단 설정창(선택 풀, 생성 버튼)을 완전히 숨김
+          document.querySelectorAll(".section").forEach(el => el.style.display = "none");
+
+          // 2. 빙고판을 최상단에 즉시 렌더링 및 노출
           renderGameBoard();
-          
           const gameArea = document.getElementById("gameArea");
           gameArea.style.display = "block";
-          document.getElementById("btnShare").style.display = "block";
           updateScore();
-          updateSelectionUI();
 
           return true;
         }
@@ -1180,7 +1181,6 @@
       }
     });
 
-    // 즉시 실행 트리거
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initApp);
     } else {
