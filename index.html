@@ -1009,12 +1009,20 @@
             };
           });
 
-          // UI 렌더링 및 게임판 노출
+          // 1. UI 렌더링 및 게임판 즉시 노출
           renderItemPool();
           renderGameBoard();
-          document.getElementById("gameArea").style.display = "block";
+          
+          const gameArea = document.getElementById("gameArea");
+          gameArea.style.display = "block";
           document.getElementById("btnShare").style.display = "block";
           updateScore();
+
+          // 2. 링크 접속 시 빙고판 위치로 즉시 자동 스크롤
+          setTimeout(() => {
+            gameArea.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+
           return true;
         }
       } catch (e) {
