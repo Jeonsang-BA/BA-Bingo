@@ -922,69 +922,75 @@
       return lines;
     }
 
-    // 2. 링크 복사 함수 (유형 및 체크상태 포함)
-    function copyShareUrl() {
-      const chosenItems = currentBoard.map(b => ({
-        word: b.word,
-        img: b.img,
-        caption: b.caption || "",
-        checked: b.checked || false
-      }));
-      
-      const payload = {
-        t: document.getElementById("boardTitle").value.trim(),
-        s: currentSize,
-        c: currentCriteria,
-        items: chosenItems
-      };
-      
-      const hashData = encodeURIComponent(JSON.stringify(payload));
-      const shareUrl = `${window.location.origin}${window.location.pathname}#${hashData}`;
+// 2. 링크 복사 함수 (제목이 같아도 무조건 고유 해시로 갱신)
+function copyShareUrl() {
+  const chosenItems = currentBoard.map(b => ({
+    word: b.word,
+    img: b.img,
+    caption: b.caption || "",
+    checked: b.checked || false
+  }));
+  
+  const payload = {
+    t: document.getElementById("boardTitle").value.trim(),
+    s: currentSize,
+    c: currentCriteria,
+    items: chosenItems,
+    ts: Date.now() // 고유 타임스탬프 추가로 동일 제목 덮어쓰기/무시 현상 방지
+  };
+  
+  const hashData = encodeURIComponent(JSON.stringify(payload));
+  const shareUrl = `${window.location.origin}${window.location.pathname}#${hashData}`;
 
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(shareUrl).then(() => {
-          alert("현재 빙고판 링크가 복사되었습니다!");
-        }).catch(() => {
-          prompt("아래 링크를 복사하세요:", shareUrl);
-        });
-      } else {
-        prompt("아래 링크를 복사하세요:", shareUrl);
-      }
+  // 현재 브라우저 주소창도 방금 만든 공유 링크로 즉시 동기화
+  try {
+    history.replaceState(null, "", `#${hashData}`);
+  } catch (e) {}
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      alert("현재 빙고판 링크가 복사되었습니다!");
+    }).catch(() => {
+      prompt("아래 링크를 복사하세요:", shareUrl);
+    });
+  } else {
+    prompt("아래 링크를 복사하세요:", shareUrl);
+  }
+}
+
+// 3. 공유 링크 자동 파싱 함수
+function checkSharedUrl() {
+  if (!window.location.hash || window.location.hash.length <= 1) return false;
+
+  try {
+    const rawHash = window.location.hash.substring(1);
+    const payload = JSON.parse(decodeURIComponent(rawHash));
+
+    if (payload.t !== undefined) {
+      document.getElementById("boardTitle").value = payload.t;
     }
-
-    // 3. 공유 링크 자동 파싱 함수
-    function checkSharedUrl() {
-      if (!window.location.hash || window.location.hash.length <= 1) return false;
-
-      try {
-        const rawHash = window.location.hash.substring(1);
-        const payload = JSON.parse(decodeURIComponent(rawHash));
-
-        if (payload.t) {
-          document.getElementById("boardTitle").value = payload.t;
-        }
-        if (payload.s) {
-          currentSize = payload.s;
-          document.querySelectorAll(".size-btn").forEach(btn => {
-            btn.classList.toggle("active", btn.innerText.includes(`${currentSize} x ${currentSize}`));
-          });
-        }
-        if (payload.c) {
-          setCriteria(payload.c);
-        }
-        if (Array.isArray(payload.items) && payload.items.length === currentSize * currentSize) {
-          currentBoard = payload.items;
-          renderGameBoard();
-          document.getElementById("gameArea").style.display = "block";
-          document.getElementById("btnShare").style.display = "block";
-          updateScore();
-          return true;
-        }
-      } catch (e) {
-        console.error("공유 데이터 로드 중 오류:", e);
-      }
-      return false;
+    if (payload.s) {
+      currentSize = payload.s;
+      document.querySelectorAll(".size-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.innerText.includes(`${currentSize} x ${currentSize}`));
+      });
     }
+    if (payload.c) {
+      setCriteria(payload.c);
+    }
+    if (Array.isArray(payload.items) && payload.items.length === currentSize * currentSize) {
+      currentBoard = payload.items;
+      renderGameBoard();
+      document.getElementById("gameArea").style.display = "block";
+      document.getElementById("btnShare").style.display = "block";
+      updateScore();
+      return true;
+    }
+  } catch (e) {
+    console.error("공유 데이터 로드 중 오류:", e);
+  }
+  return false;
+}
 
     // 4. 이미지 저장 (비율 유지 크롭 + 커스텀 파일명)
     async function exportAsImage() {
