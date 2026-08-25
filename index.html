@@ -496,11 +496,11 @@
     <!-- 3. 생성 버튼 -->
     <div class="section" style="border-bottom: none; margin-bottom: 0;">
       <div class="btn-group">
-        <button class="action-btn btn-primary" id="btnGenerate" onclick="handleGenerateClick()" disabled>새 빙고판 생성하기</button>
+        <button class="action-btn btn-primary" id="btnGenerate" onclick="generateNewGame()" disabled>새 빙고판 무작위 생성하기</button>
       </div>
     </div>
 
-    <!-- 4. 게임 영역 -->
+    <!-- 4. 게임 영역 (링크 진입 시 즉시 노출됨) -->
     <div id="gameArea" style="display: none; margin-top: 24px; padding-top: 16px; border-top: 2px solid #e2e8f0;">
       
       <div class="criteria-box">
@@ -526,7 +526,7 @@
 
       <div class="mode-bar">
         <button class="mode-btn" id="btnEditMode" onclick="toggleEditMode()">✏️ 빙고배치/조건 수정</button>
-        <button class="action-btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onclick="shuffleCurrentBoard()">🔀 랜덤 배치</button>
+        <button class="action-btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onclick="shuffleCurrentBoard()">🔀 랜덤 섞기</button>
       </div>
       
       <div class="grid" id="board"></div>
@@ -546,7 +546,6 @@
     let currentBoard = [];
     let currentFilter = "";
     let currentCriteria = "ownership";
-    let isLoadedFromUrl = false;
 
     let isEditMode = false;
     let selectedSwapIndex = null;
@@ -572,12 +571,14 @@
 
       updateTextarea();
 
+      // 링크(해시) 확인 및 직결 복원
+      let hasShareData = false;
       if (window.location.hash && window.location.hash.length > 1) {
-        const success = checkSharedUrl();
-        if (!success) {
-          loadLocalPoolOrRandom();
-        }
-      } else {
+        hasShareData = checkSharedUrl();
+      }
+
+      // 링크 정보가 없는 일반 진입 시에만 로컬 스토리지 불러오기
+      if (!hasShareData) {
         loadLocalPoolOrRandom();
       }
     }
@@ -644,7 +645,6 @@
     }
 
     function toggleItemSelection(idx, chipElement) {
-      isLoadedFromUrl = false;
       if (selectedIndices.has(idx)) {
         selectedIndices.delete(idx);
         chipElement.classList.remove("checked");
@@ -661,7 +661,6 @@
     }
 
     function autoSelectItems() {
-      isLoadedFromUrl = false;
       const target = currentSize * currentSize;
       selectedIndices.clear();
       const indices = Array.from({ length: itemList.length }, (_, i) => i);
@@ -672,7 +671,6 @@
     }
 
     function selectAllItems() {
-      isLoadedFromUrl = false;
       const target = currentSize * currentSize;
       selectedIndices.clear();
       for (let i = 0; i < Math.min(target, itemList.length); i++) {
@@ -683,7 +681,6 @@
     }
 
     function clearSelectedItems() {
-      isLoadedFromUrl = false;
       selectedIndices.clear();
       renderItemPool();
       savePoolToLocal();
@@ -739,9 +736,9 @@
       const parsed = [];
       lines.forEach(line => {
         const parts = line.split("|").map(p => p.trim());
-        if (parts.length >= 3) parsed.push({ word: parts[0], img: parts[1], alias: parts[2] });
-        else if (parts.length === 2) parsed.push({ word: parts[0], img: parts[1], alias: "" });
-        else if (parts.length === 1) parsed.push({ word: parts[0], img: "", alias: "" });
+        if (parts.length >= 3) parts.push({ word: parts[0], img: parts[1], alias: parts[2] });
+        else if (parts.length === 2) parts.push({ word: parts[0], img: parts[1], alias: "" });
+        else if (parts.length === 1) parts.push({ word: parts[0], img: "", alias: "" });
       });
       if (parsed.length < 16) { alert("최소 16개 이상의 캐릭터가 필요합니다."); return; }
       itemList = parsed;
@@ -751,29 +748,18 @@
       alert(`${itemList.length}개의 캐릭터가 적용 및 저장되었습니다.`);
     }
 
-    function handleGenerateClick() {
-      if (isLoadedFromUrl && currentBoard.length > 0) {
-        if (!confirm("현재 공유받은 빙고판 배치가 초기화되고 새로 무작위 배치됩니다. 계속하시겠습니까?")) {
-          document.getElementById("gameArea").scrollIntoView({ behavior: 'smooth' });
-          return;
-        }
-      }
-      generateNewGame();
-    }
-
+    // 사용자가 직접 '새로 생성하기'를 눌렀을 때만 랜덤 섞기 발동
     function generateNewGame() {
-      isLoadedFromUrl = false;
       const chosenItems = Array.from(selectedIndices).map(idx => itemList[idx]);
       chosenItems.sort(() => 0.5 - Math.random());
       currentBoard = chosenItems.map(item => ({ ...item, caption: "", checked: false }));
       
+      const gameArea = document.getElementById("gameArea");
+      gameArea.style.display = "block";
       renderGameBoard();
       updateScore();
       
-      const gameArea = document.getElementById("gameArea");
-      gameArea.style.display = "block";
       gameArea.scrollIntoView({ behavior: 'smooth' });
-      
       copyShareUrl(true);
     }
 
@@ -818,6 +804,7 @@
 
     function renderGameBoard() {
       const boardElement = document.getElementById("board");
+      if (!boardElement) return;
       boardElement.style.gridTemplateColumns = `repeat(${currentSize}, 1fr)`;
       boardElement.innerHTML = "";
 
@@ -890,7 +877,10 @@
     function updateScore() {
       const lines = calculateBingoLines();
       const criteriaName = currentCriteria === "ownership" ? "단순 보유 기준" : "전용무기 기준";
-      document.getElementById("bingoScore").innerText = `완성된 빙고 (${criteriaName}): ${lines}줄`;
+      const scoreElem = document.getElementById("bingoScore");
+      if (scoreElem) {
+        scoreElem.innerText = `완성된 빙고 (${criteriaName}): ${lines}줄`;
+      }
     }
 
     function calculateBingoLines() {
@@ -916,6 +906,7 @@
       const size = currentSize;
       const mode = currentCriteria;
 
+      // 0번부터 24번 칸 순서 그대로 items 직렬화
       const itemTokens = currentBoard.map(b => {
         let idx = itemList.findIndex(item => item.word === b.word);
         if (idx === -1) idx = 0;
@@ -942,6 +933,7 @@
       }
     }
 
+    // 링크에서 [1, 2, 5, 4, 3, ...] 순서 그대로 100% 직결 배치
     function checkSharedUrl() {
       const hash = window.location.hash;
       if (!hash || hash.length <= 1) return false;
@@ -986,6 +978,7 @@
         if (tokens.length > 0) {
           selectedIndices.clear();
 
+          // 토큰 순서 [0번칸, 1번칸, 2번칸...] 그대로 currentBoard 생성
           currentBoard = tokens.map(token => {
             const parts = token.split(":");
             const idx = parseInt(parts[0], 10);
@@ -1012,16 +1005,17 @@
             };
           });
 
-          isLoadedFromUrl = true;
-
+          // 상단 학생 풀 선택 상태 동기화
           renderItemPool();
           updateSelectionUI();
 
+          // 빙고판 즉시 렌더링 및 화면 노출
           const gameArea = document.getElementById("gameArea");
           gameArea.style.display = "block";
           renderGameBoard();
           updateScore();
 
+          // 빙고판 위치로 즉시 스크롤
           setTimeout(() => {
             gameArea.scrollIntoView({ behavior: "smooth", block: "start" });
           }, 100);
