@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>이미지 & 단어 멀티플레이 빙고</title>
+  <title>블루아카이브 인권/전무 빙고</title>
   <style>
     * {
       box-sizing: border-box;
@@ -24,18 +24,37 @@
 
     .container {
       width: 100%;
-      max-width: 600px;
+      max-width: 620px;
       background: #ffffff;
       padding: 24px;
       border-radius: 16px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
     }
 
-    h1 {
-      font-size: 1.4rem;
-      text-align: center;
+    .title-input-wrap {
       margin-bottom: 20px;
+    }
+
+    .title-input-wrap label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #334155;
+    }
+
+    .title-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      outline: none;
       color: #0f172a;
+    }
+    .title-input:focus {
+      border-color: #2563eb;
     }
 
     .section {
@@ -75,7 +94,6 @@
       color: #ffffff;
     }
 
-    /* 접을 수 있는 아코디언 스타일 */
     details.custom-accordion {
       background: #f8fafc;
       border: 1px solid #e2e8f0;
@@ -91,10 +109,6 @@
       cursor: pointer;
       user-select: none;
       outline: none;
-    }
-
-    details.custom-accordion summary:hover {
-      color: #2563eb;
     }
 
     .accordion-content {
@@ -186,12 +200,59 @@
       font-weight: 700;
     }
 
-    /* 빙고판 레이아웃 */
+    /* 빙고 판정 옵션 바 (보유 vs 전무) */
+    .criteria-box {
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .criteria-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 8px;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 12px;
+    }
+
+    .radio-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 12px;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+
+    .radio-btn input {
+      display: none;
+    }
+
+    .radio-btn.active {
+      background: #eff6ff;
+      border-color: #2563eb;
+      color: #1d4ed8;
+      font-weight: 700;
+    }
+
     .game-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .bingo-score {
@@ -267,10 +328,41 @@
 
     .cell img {
       width: 100%;
-      height: 62%;
+      height: 60%;
       object-fit: cover;
       border-radius: 4px;
       pointer-events: none;
+    }
+
+    .caption-badge {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: rgba(15, 23, 42, 0.85);
+      color: #f8fafc;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 4px;
+      z-index: 2;
+      pointer-events: none;
+      line-height: 1.2;
+    }
+
+    .cell-caption-input {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      right: 3px;
+      z-index: 4;
+      font-size: 0.7rem;
+      padding: 2px 4px;
+      border: 1px solid #f59e0b;
+      border-radius: 4px;
+      background: #ffffff;
+      text-align: center;
+      font-weight: 700;
+      outline: none;
     }
 
     .cell .word-label {
@@ -286,25 +378,46 @@
       margin-top: 2px;
     }
 
-    .cell.selected {
-      border-color: #2563eb;
-      transform: scale(0.96);
+    /* 상태별 오버레이 스타일 (0: 미보유, 1: 명함 보유, 2: 전무 장착) */
+    .cell.status-1 {
+      border-color: #10b981;
     }
-
-    .cell.selected::after {
-      content: "✓";
+    .cell.status-1::after {
+      content: "보유";
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(37, 99, 235, 0.75);
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(16, 185, 129, 0.75);
       color: #ffffff;
-      font-size: 1.8rem;
+      font-size: 1.1rem;
       font-weight: 900;
       display: flex;
       align-items: center;
       justify-content: center;
+      z-index: 3;
+    }
+
+    .cell.status-2 {
+      border-color: #2563eb;
+    }
+    .cell.status-2::after {
+      content: "전무★";
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(37, 99, 235, 0.82);
+      color: #ffffff;
+      font-size: 1.15rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3;
+    }
+
+    .help-hint {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin-bottom: 8px;
+      text-align: center;
     }
 
     .btn-group {
@@ -350,7 +463,10 @@
 <body>
 
   <div class="container">
-    <h1>🖼️ 커스텀 이미지 빙고판</h1>
+    <div class="title-input-wrap">
+      <label for="boardTitle">📌 빙고 제목</label>
+      <input type="text" id="boardTitle" class="title-input" value="블루아카이브 인권 캐릭터 빙고" placeholder="빙고판 제목을 입력하세요">
+    </div>
 
     <!-- 1. 판 크기 선택 -->
     <div class="section">
@@ -362,9 +478,8 @@
       </div>
     </div>
 
-    <!-- 2. 단어 풀 선택 및 관리 -->
+    <!-- 2. 단어 풀 관리 및 선택 -->
     <div class="section">
-      <!-- 기본 접힘 처리된 데이터 수동 관리 영역 -->
       <details class="custom-accordion">
         <summary>⚙️ 단어 & 이미지 데이터 직접 관리 (클릭하여 열기)</summary>
         <div class="accordion-content">
@@ -379,11 +494,11 @@
       </details>
 
       <div class="section-title" style="margin-top: 10px;">
-        <span>2. 빙고판에 넣을 아이템 선택</span>
+        <span>2. 빙고판에 넣을 캐릭터 선택</span>
         <span class="badge" id="selectionCount">선택: 0 / 25</span>
       </div>
 
-      <input type="text" id="searchInput" class="search-input" placeholder="🔍 단어 검색..." oninput="handleSearch()">
+      <input type="text" id="searchInput" class="search-input" placeholder="🔍 캐릭터 이름 검색..." oninput="handleSearch()">
       <div class="word-pool" id="itemPool"></div>
       
       <div style="margin-top: 8px; display: flex; justify-content: flex-end; gap: 12px;">
@@ -403,14 +518,31 @@
 
     <!-- 4. 게임 영역 -->
     <div id="gameArea" style="display: none; margin-top: 20px;">
+      
+      <!-- 빙고 판정 옵션 선택 라디오 바 -->
+      <div class="criteria-box">
+        <div class="criteria-label">🎯 빙고 판정 기준 선택</div>
+        <div class="radio-group">
+          <label class="radio-btn active" id="labelOwnership" onclick="setCriteria('ownership')">
+            <input type="radio" name="bingoCriteria" value="ownership" checked>
+            <span>👤 단순 보유 기준 (명함 이상)</span>
+          </label>
+          <label class="radio-btn" id="labelWeapon" onclick="setCriteria('weapon')">
+            <input type="radio" name="bingoCriteria" value="weapon">
+            <span>⚔️ 전용무기 기준 (전무 장착만)</span>
+          </label>
+        </div>
+      </div>
+
       <div class="game-header">
         <div class="bingo-score" id="bingoScore">완성된 빙고: 0줄</div>
         <button class="action-btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onclick="resetCheck()">체크 초기화</button>
       </div>
 
-      <!-- 배치 편집 도구 바 -->
+      <div class="help-hint">💡 칸을 누를 때마다 [미보유] ➔ [보유] ➔ [전무★] 순으로 순환합니다.</div>
+
       <div class="mode-bar">
-        <button class="mode-btn" id="btnEditMode" onclick="toggleEditMode()">✏️ 배치 직접 바꾸기</button>
+        <button class="mode-btn" id="btnEditMode" onclick="toggleEditMode()">✏️ 배치/캡션 직접 수정</button>
         <button class="action-btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onclick="shuffleCurrentBoard()">🔀 무작위 다시 섞기</button>
       </div>
       
@@ -429,6 +561,9 @@
     let currentBoard = [];
     let currentFilter = "";
     
+    // 판정 모드: 'ownership' (보유 이상 인정) vs 'weapon' (전용무기만 인정)
+    let currentCriteria = "ownership";
+
     let isEditMode = false;
     let selectedSwapIndex = null;
     let draggedIndex = null;
@@ -463,7 +598,7 @@
     }
 
     async function reloadDefaultJson() {
-      if (confirm("items.json 파일의 원본 데이터로 초기화하시겠습니까? (로컬 수정 내역 삭제)")) {
+      if (confirm("items.json 파일의 원본 데이터로 초기화하시겠습니까?")) {
         localStorage.removeItem("custom_image_bingo_items");
         itemList = await fetchDefaultItems();
         updateTextarea();
@@ -494,7 +629,7 @@
       });
 
       if (parsed.length < 16) {
-        alert("최소 16개 이상의 아이템이 필요합니다.");
+        alert("최소 16개 이상의 캐릭터가 필요합니다.");
         return;
       }
 
@@ -505,7 +640,7 @@
       currentFilter = "";
       renderItemPool();
       autoSelectItems();
-      alert(`${itemList.length}개의 아이템이 적용 및 저장되었습니다.`);
+      alert(`${itemList.length}개의 캐릭터가 적용 및 저장되었습니다.`);
     }
 
     function handleSearch() {
@@ -600,10 +735,18 @@
       }
     }
 
+    function setCriteria(mode) {
+      currentCriteria = mode;
+      document.getElementById("labelOwnership").classList.toggle("active", mode === "ownership");
+      document.getElementById("labelWeapon").classList.toggle("active", mode === "weapon");
+      updateScore();
+    }
+
     function generateNewGame() {
       const chosenItems = Array.from(selectedIndices).map(idx => itemList[idx]);
       chosenItems.sort(() => 0.5 - Math.random());
-      currentBoard = chosenItems.map(item => ({ ...item, selected: false }));
+      // state: 0 (미보유), 1 (명함), 2 (전무)
+      currentBoard = chosenItems.map(item => ({ ...item, caption: "", state: 0 }));
       
       renderGameBoard();
       document.getElementById("gameArea").style.display = "block";
@@ -622,7 +765,7 @@
       selectedSwapIndex = null;
       const btn = document.getElementById("btnEditMode");
       btn.classList.toggle("active", isEditMode);
-      btn.innerText = isEditMode ? "완료 (플레이 모드)" : "✏️ 배치 직접 바꾸기";
+      btn.innerText = isEditMode ? "수정 완료 (플레이 모드)" : "✏️ 배치/캡션 직접 수정";
       renderGameBoard();
     }
 
@@ -635,6 +778,10 @@
       updateScore();
     }
 
+    function updateCaption(index, value) {
+      currentBoard[index].caption = value.trim();
+    }
+
     function renderGameBoard() {
       const boardElement = document.getElementById("board");
       boardElement.style.gridTemplateColumns = `repeat(${currentSize}, 1fr)`;
@@ -642,12 +789,11 @@
 
       currentBoard.forEach((item, index) => {
         const cell = document.createElement("div");
-        cell.className = `cell ${!isEditMode && item.selected ? "selected" : ""} ${selectedSwapIndex === index ? "edit-source" : ""}`;
+        const statusClass = !isEditMode ? `status-${item.state}` : "";
+        cell.className = `cell ${statusClass} ${selectedSwapIndex === index ? "edit-source" : ""}`;
         
         if (isEditMode) {
           cell.draggable = true;
-          cell.title = "드래그하거나 클릭하여 자리를 바꿀 수 있습니다.";
-
           cell.ondragstart = (e) => {
             draggedIndex = index;
             e.dataTransfer.effectAllowed = "move";
@@ -668,14 +814,24 @@
           };
         }
 
-        const imgTag = item.img ? `<img src="${item.img}" alt="${item.word}" loading="lazy" crossorigin="anonymous">` : `<div style="height:62%;"></div>`;
+        const imgTag = item.img ? `<img src="${item.img}" alt="${item.word}" loading="lazy" crossorigin="anonymous">` : `<div style="height:60%;"></div>`;
+        
+        let captionHTML = "";
+        if (isEditMode) {
+          captionHTML = `<input type="text" class="cell-caption-input" placeholder="조건(예: 전3)" value="${item.caption || ""}" onclick="event.stopPropagation()" oninput="updateCaption(${index}, this.value)">`;
+        } else if (item.caption) {
+          captionHTML = `<div class="caption-badge">${item.caption}</div>`;
+        }
+
         cell.innerHTML = `
+          ${captionHTML}
           ${imgTag}
           <div class="word-label">${item.word}</div>
         `;
 
-        cell.onclick = () => {
+        cell.onclick = (e) => {
           if (isEditMode) {
+            if (e.target.tagName === 'INPUT') return;
             if (selectedSwapIndex === null) {
               selectedSwapIndex = index;
               renderGameBoard();
@@ -686,7 +842,8 @@
               swapCells(selectedSwapIndex, index);
             }
           } else {
-            currentBoard[index].selected = !currentBoard[index].selected;
+            // 플레이 모드: 0(미보유) -> 1(명함) -> 2(전무) -> 0 순환
+            currentBoard[index].state = (currentBoard[index].state + 1) % 3;
             renderGameBoard();
             updateScore();
           }
@@ -697,14 +854,24 @@
     }
 
     function resetCheck() {
-      currentBoard.forEach(c => c.selected = false);
+      currentBoard.forEach(c => c.state = 0);
       renderGameBoard();
       updateScore();
     }
 
+    // 판정 기준에 따른 셀 유효 체크 판정
+    function isCellValid(item) {
+      if (currentCriteria === "ownership") {
+        return item.state >= 1; // 명함(1) 또는 전무(2) 모두 인정
+      } else {
+        return item.state === 2; // 전무(2)만 인정
+      }
+    }
+
     function updateScore() {
       const lines = calculateBingoLines();
-      document.getElementById("bingoScore").innerText = `완성된 빙고: ${lines}줄`;
+      const criteriaName = currentCriteria === "ownership" ? "보유 기준" : "전용무기 기준";
+      document.getElementById("bingoScore").innerText = `완성된 빙고 (${criteriaName}): ${lines}줄`;
     }
 
     function calculateBingoLines() {
@@ -712,24 +879,24 @@
       const n = currentSize;
 
       for (let r = 0; r < n; r++) {
-        if (currentBoard.slice(r * n, (r + 1) * n).every(c => c.selected)) lines++;
+        if (currentBoard.slice(r * n, (r + 1) * n).every(isCellValid)) lines++;
       }
       for (let c = 0; c < n; c++) {
         let full = true;
         for (let r = 0; r < n; r++) {
-          if (!currentBoard[r * n + c].selected) { full = false; break; }
+          if (!isCellValid(currentBoard[r * n + c])) { full = false; break; }
         }
         if (full) lines++;
       }
       let d1 = true;
       for (let i = 0; i < n; i++) {
-        if (!currentBoard[i * n + i].selected) { d1 = false; break; }
+        if (!isCellValid(currentBoard[i * n + i])) { d1 = false; break; }
       }
       if (d1) lines++;
 
       let d2 = true;
       for (let i = 0; i < n; i++) {
-        if (!currentBoard[i * n + (n - 1 - i)].selected) { d2 = false; break; }
+        if (!isCellValid(currentBoard[i * n + (n - 1 - i)])) { d2 = false; break; }
       }
       if (d2) lines++;
 
@@ -737,8 +904,9 @@
     }
 
     function copyShareUrl() {
-      const chosenItems = currentBoard.map(b => ({ word: b.word, img: b.img }));
+      const chosenItems = currentBoard.map(b => ({ word: b.word, img: b.img, caption: b.caption || "" }));
       const payload = {
+        t: document.getElementById("boardTitle").value.trim(),
         s: currentSize,
         items: chosenItems
       };
@@ -747,7 +915,7 @@
       const shareUrl = `${window.location.origin}${window.location.pathname}#${hashData}`;
 
       navigator.clipboard.writeText(shareUrl).then(() => {
-        alert("현재 배치된 빙고판 링크가 복사되었습니다!");
+        alert("빙고판 링크가 복사되었습니다!");
       }).catch(() => {
         prompt("아래 링크를 복사하세요:", shareUrl);
       });
@@ -759,9 +927,12 @@
           const hashData = window.location.hash.substring(1);
           const payload = JSON.parse(decodeURIComponent(atob(hashData)));
 
+          if (payload.t) {
+            document.getElementById("boardTitle").value = payload.t;
+          }
           currentSize = payload.s;
           changeSize(currentSize);
-          currentBoard = payload.items.map(item => ({ ...item, selected: false }));
+          currentBoard = payload.items.map(item => ({ ...item, state: 0 }));
           renderGameBoard();
           document.getElementById("gameArea").style.display = "block";
           document.getElementById("btnShare").style.display = "block";
@@ -777,9 +948,10 @@
       const ctx = canvas.getContext("2d");
       const dpr = 2;
 
+      const title = document.getElementById("boardTitle").value.trim() || "인권 빙고";
       const width = 640;
       const padding = 24;
-      const headerHeight = 90;
+      const headerHeight = 100;
       const boardWidth = width - padding * 2;
       const gap = 8;
       const cellSize = (boardWidth - (currentSize - 1) * gap) / currentSize;
@@ -794,13 +966,14 @@
       ctx.fillRect(0, 0, width, totalHeight);
 
       ctx.fillStyle = "#0f172a";
-      ctx.font = "bold 22px -apple-system, sans-serif";
+      ctx.font = "bold 20px -apple-system, sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText(`${currentSize} x ${currentSize} 이미지 BINGO`, width / 2, 40);
+      ctx.fillText(title, width / 2, 40);
 
+      const criteriaName = currentCriteria === "ownership" ? "단순 보유 기준" : "전용무기 기준";
       ctx.fillStyle = "#2563eb";
-      ctx.font = "bold 16px -apple-system, sans-serif";
-      ctx.fillText(`완성된 빙고: ${calculateBingoLines()}줄`, width / 2, 68);
+      ctx.font = "bold 15px -apple-system, sans-serif";
+      ctx.fillText(`완성된 빙고 (${criteriaName}): ${calculateBingoLines()}줄`, width / 2, 68);
 
       const imagePromises = currentBoard.map(item => {
         return new Promise((resolve) => {
@@ -823,7 +996,12 @@
 
         ctx.save();
         ctx.fillStyle = "#ffffff";
-        ctx.strokeStyle = item.selected ? "#2563eb" : "#cbd5e1";
+        
+        let strokeColor = "#cbd5e1";
+        if (item.state === 1) strokeColor = "#10b981";
+        if (item.state === 2) strokeColor = "#2563eb";
+
+        ctx.strokeStyle = strokeColor;
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.roundRect(x, y, cellSize, cellSize, 8);
@@ -832,9 +1010,28 @@
         ctx.clip();
 
         const loadedImg = loadedImages[index];
-        const imgH = cellSize * 0.62;
+        const imgH = cellSize * 0.60;
         if (loadedImg) {
           ctx.drawImage(loadedImg, x + 4, y + 4, cellSize - 8, imgH);
+        }
+
+        if (item.caption) {
+          ctx.font = "bold 10px -apple-system, sans-serif";
+          const textMetrics = ctx.measureText(item.caption);
+          const bgW = textMetrics.width + 10;
+          const bgH = 16;
+          const bx = x + cellSize - bgW - 4;
+          const by = y + 4;
+
+          ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+          ctx.beginPath();
+          ctx.roundRect(bx, by, bgW, bgH, 4);
+          ctx.fill();
+
+          ctx.fillStyle = "#ffffff";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(item.caption, bx + bgW / 2, by + bgH / 2);
         }
 
         ctx.fillStyle = "#1e293b";
@@ -843,18 +1040,26 @@
         ctx.textBaseline = "middle";
         ctx.fillText(item.word, x + cellSize / 2, y + imgH + (cellSize - imgH) / 2 + 2);
 
-        if (item.selected) {
-          ctx.fillStyle = "rgba(37, 99, 235, 0.75)";
+        // 상태별 렌더링
+        if (item.state === 1) {
+          ctx.fillStyle = "rgba(16, 185, 129, 0.75)";
           ctx.fillRect(x, y, cellSize, cellSize);
           ctx.fillStyle = "#ffffff";
-          ctx.font = `bold ${cellSize * 0.4}px -apple-system, sans-serif`;
-          ctx.fillText("✓", x + cellSize / 2, y + cellSize / 2);
+          ctx.font = `bold ${cellSize * 0.25}px -apple-system, sans-serif`;
+          ctx.fillText("보유", x + cellSize / 2, y + cellSize / 2);
+        } else if (item.state === 2) {
+          ctx.fillStyle = "rgba(37, 99, 235, 0.82)";
+          ctx.fillRect(x, y, cellSize, cellSize);
+          ctx.fillStyle = "#ffffff";
+          ctx.font = `bold ${cellSize * 0.25}px -apple-system, sans-serif`;
+          ctx.fillText("전무★", x + cellSize / 2, y + cellSize / 2);
         }
+
         ctx.restore();
       });
 
       const link = document.createElement("a");
-      link.download = `image_bingo_${Date.now()}.png`;
+      link.download = `${title.replace(/\s+/g, '_')}_${Date.now()}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
     }
