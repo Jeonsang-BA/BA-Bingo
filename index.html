@@ -333,7 +333,6 @@
       pointer-events: none;
     }
 
-    /* 우측 상단 조건 캡션 */
     .caption-badge {
       position: absolute;
       top: 4px;
@@ -362,15 +361,16 @@
       top: 3px;
       left: 3px;
       right: 3px;
-      z-index: 4;
-      font-size: 0.7rem;
-      padding: 2px 4px;
-      border: 1px solid #f59e0b;
+      z-index: 10;
+      font-size: 0.72rem;
+      padding: 3px 4px;
+      border: 2px solid #f59e0b;
       border-radius: 4px;
       background: #ffffff;
       text-align: center;
       font-weight: 700;
       outline: none;
+      color: #0f172a;
     }
 
     .cell .word-label {
@@ -386,14 +386,12 @@
       margin-top: 2px;
     }
 
-    /* 🟡 성급 보유 체크 활성화 스타일 */
     .cell.checked-star {
       border: 3.5px solid #eab308 !important;
       background-color: #fefce8;
       box-shadow: inset 0 0 8px rgba(234, 179, 8, 0.15);
     }
 
-    /* 🔵 전무 체크 활성화 스타일 */
     .cell.checked-weapon {
       border: 3.5px solid #06b6d4 !important;
       background-color: #ecfeff;
@@ -726,7 +724,6 @@
       updateScore();
     }
 
-    // 💡 캡션 텍스트로 타입 자동 판별 (weapon / star / none)
     function getCaptionType(caption) {
       const cap = (caption || "").trim().toLowerCase();
       if (/전[1-4]|전무|고유/.test(cap)) {
@@ -761,6 +758,7 @@
       btn.classList.toggle("active", isEditMode);
       btn.innerText = isEditMode ? "수정 완료 (플레이 모드)" : "✏️ 배치/조건(3성, 전2 등) 직접 수정";
       renderGameBoard();
+      updateScore();
     }
 
     function swapCells(idx1, idx2) {
@@ -768,12 +766,6 @@
       currentBoard[idx1] = currentBoard[idx2];
       currentBoard[idx2] = temp;
       selectedSwapIndex = null;
-      renderGameBoard();
-      updateScore();
-    }
-
-    function updateCaption(index, value) {
-      currentBoard[index].caption = value.trim();
       renderGameBoard();
       updateScore();
     }
@@ -797,6 +789,10 @@
         if (isEditMode) {
           cell.draggable = true;
           cell.ondragstart = (e) => {
+            if (e.target.tagName === 'INPUT') {
+              e.preventDefault();
+              return;
+            }
             draggedIndex = index;
             e.dataTransfer.effectAllowed = "move";
           };
@@ -820,7 +816,8 @@
         
         let captionHTML = "";
         if (isEditMode) {
-          captionHTML = `<input type="text" class="cell-caption-input" placeholder="조건 (예: 3성, 전2)" value="${item.caption || ""}" onclick="event.stopPropagation()" oninput="updateCaption(${index}, this.value)">`;
+          // input 요소 생성 (onblur, onkeydown 등으로 값만 조용히 업데이트)
+          captionHTML = `<input type="text" class="cell-caption-input" placeholder="조건(예: 3성, 전2)" value="${item.caption || ""}" onclick="event.stopPropagation()" oninput="currentBoard[${index}].caption = this.value.trim()" onblur="updateScore()" onkeydown="if(event.key==='Enter'){this.blur();}">`;
         } else if (item.caption) {
           captionHTML = `<div class="caption-badge type-${type}">${item.caption}</div>`;
         }
@@ -844,7 +841,6 @@
               swapCells(selectedSwapIndex, index);
             }
           } else {
-            // 플레이 모드: 체크 토글
             currentBoard[index].checked = !currentBoard[index].checked;
             renderGameBoard();
             updateScore();
@@ -861,14 +857,12 @@
       updateScore();
     }
 
-    // 빙고 판정 로직
     function isCellValid(item) {
       if (!item.checked) return false;
 
       if (currentCriteria === "ownership") {
-        return true; // 보유 기준 모드: 체크된 칸 전체 인정
+        return true;
       } else {
-        // 전용무기 기준 모드: 캡션이 전1~전4인 칸만 인정
         return getCaptionType(item.caption) === "weapon";
       }
     }
