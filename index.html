@@ -552,11 +552,10 @@
     let selectedSwapIndex = null;
     let draggedIndex = null;
 
-// 1. 앱 초기화 (공유 링크 접속 시 덮어쓰기 방지)
-   // 1. 데이터가 완전히 준비된 후 앱 실행을 보장하는 함수
+    // 1. 앱 실행 진입점
     function initApp() {
-      // items_data.js가 아직 로드되지 않았다면 50ms 후 재시도
-      if (!window.DEFAULT_ITEMS || window.DEFAULT_ITEMS.length === 0) {
+      // items_data.js가 아직 준비되지 않았으면 50ms 대기 후 재시도
+      if (typeof window.DEFAULT_ITEMS === "undefined" || !window.DEFAULT_ITEMS || window.DEFAULT_ITEMS.length === 0) {
         setTimeout(initApp, 50);
         return;
       }
@@ -564,28 +563,13 @@
       itemList = JSON.parse(JSON.stringify(window.DEFAULT_ITEMS));
       updateTextarea();
 
-      // 데이터가 완벽히 들어온 상태에서 공유 링크 파싱
+      // 공유 링크가 있는지 확인
       const isLoadedFromShare = checkSharedUrl();
 
-      // 공유 링크가 아닐 때만 기본 선택 수행
       if (!isLoadedFromShare) {
         renderItemPool();
         autoSelectItems();
       }
-    }
-
-    // URL 해시가 변경될 때도 즉시 반영
-    window.addEventListener("hashchange", () => {
-      if (itemList.length > 0) {
-        checkSharedUrl();
-      }
-    });
-
-    // DOM 로드 완료 후 실행
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initApp);
-    } else {
-      initApp();
     }
 
     function reloadDefaultJson() {
@@ -740,13 +724,15 @@
       const countLabel = document.getElementById("selectionCount");
       const generateBtn = document.getElementById("btnGenerate");
 
-      countLabel.innerText = `선택: ${selectedIndices.size} / ${target}`;
-      if (selectedIndices.size === target) {
-        countLabel.classList.add("ready");
-        generateBtn.disabled = false;
-      } else {
-        countLabel.classList.remove("ready");
-        generateBtn.disabled = true;
+      if (countLabel) {
+        countLabel.innerText = `선택: ${selectedIndices.size} / ${target}`;
+        if (selectedIndices.size === target) {
+          countLabel.classList.add("ready");
+          if (generateBtn) generateBtn.disabled = false;
+        } else {
+          countLabel.classList.remove("ready");
+          if (generateBtn) generateBtn.disabled = true;
+        }
       }
     }
 
@@ -934,13 +920,11 @@
       return lines;
     }
 
-    // 1. 심플 파라미터 기반 링크 생성 (학생번호 + 라벨만 직관적으로 조합)
     function copyShareUrl() {
       const title = encodeURIComponent(document.getElementById("boardTitle").value.trim());
       const size = currentSize;
       const mode = currentCriteria;
 
-      // "학생번호:라벨" 형태로 간결하게 연결 (예: 0,14:전2,32:3성)
       const itemTokens = currentBoard.map(b => {
         let idx = itemList.findIndex(item => item.word === b.word);
         if (idx === -1) idx = 0;
@@ -965,7 +949,6 @@
       }
     }
 
-// 2. 공유 링크 파싱 (선택 상태 및 체크 상태 완벽 복원)
     function checkSharedUrl() {
       if (!window.location.hash || window.location.hash.length <= 1) return false;
 
@@ -980,12 +963,10 @@
 
         if (!itemsStr) return false;
 
-        // 제목 복원
         if (title) {
           document.getElementById("boardTitle").value = decodeURIComponent(title);
         }
         
-        // 판 크기 복원
         if (size) {
           currentSize = size;
           document.querySelectorAll(".size-btn").forEach(btn => {
@@ -993,7 +974,6 @@
           });
         }
 
-        // 모드 복원
         if (mode) {
           setCriteria(mode);
         }
@@ -1006,7 +986,6 @@
             const [idxStr, capStr] = token.split(":");
             const idx = parseInt(idxStr, 10);
             
-            // 공유된 학생의 인덱스를 상단 선택 칩에도 동기화
             if (!isNaN(idx) && idx >= 0 && idx < itemList.length) {
               selectedIndices.add(idx);
             }
@@ -1020,7 +999,6 @@
             };
           });
 
-          // 1. UI 렌더링 및 게임판 즉시 노출
           renderItemPool();
           renderGameBoard();
           
@@ -1028,11 +1006,7 @@
           gameArea.style.display = "block";
           document.getElementById("btnShare").style.display = "block";
           updateScore();
-
-          // 2. 링크 접속 시 빙고판 위치로 즉시 자동 스크롤
-          setTimeout(() => {
-            gameArea.scrollIntoView({ behavior: 'smooth' });
-          }, 100);
+          updateSelectionUI();
 
           return true;
         }
@@ -1042,7 +1016,6 @@
       return false;
     }
 
-    // 3. 비율 유지 크롭 이미지 내보내기 (커스텀 제목 파일명)
     async function exportAsImage() {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
@@ -1128,7 +1101,6 @@
         ctx.stroke();
         ctx.clip();
 
-        // 찌그러짐 방지 비율 크롭
         const loadedImg = loadedImages[index];
         const imgAreaHeight = cellSize * 0.62;
         const imgPadding = 4;
@@ -1202,8 +1174,13 @@
       link.click();
     }
 
-    window.addEventListener("hashchange", checkSharedUrl);
+    window.addEventListener("hashchange", () => {
+      if (itemList.length > 0) {
+        checkSharedUrl();
+      }
+    });
 
+    // 즉시 실행 트리거
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initApp);
     } else {
