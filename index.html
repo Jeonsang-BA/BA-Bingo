@@ -538,6 +538,7 @@
     </div>
   </div>
 
+  <!-- 데이터 스크립트 연결 -->
   <script src="./items_data.js"></script>
   <script>
     let currentSize = 5;
@@ -567,7 +568,7 @@
       updateTextarea();
       renderItemPool();
 
-      // 2. 공유 링크 파싱 시도 (링크가 없으면 랜덤 자동 선택)
+      // 2. 공유 링크 파싱 (공유된 상태가 아니면 자동 선택)
       const isLoadedFromShare = checkSharedUrl();
       if (!isLoadedFromShare) {
         autoSelectItems();
@@ -920,34 +921,24 @@
       return lines;
     }
 
-    // 초경량 링크 공유 (URL 길이 축소 및 유니코드 안전 인코딩)
+    // 1. 심플 파라미터 기반 링크 생성 (학생번호 + 라벨만 직관적으로 조합)
     function copyShareUrl() {
-      const miniItems = currentBoard.map(b => {
+      const title = encodeURIComponent(document.getElementById("boardTitle").value.trim());
+      const size = currentSize;
+      const mode = currentCriteria;
+
+      // "학생번호:라벨" 형태로 간결하게 연결 (예: 0,14:전2,32:3성)
+      const itemTokens = currentBoard.map(b => {
         let idx = itemList.findIndex(item => item.word === b.word);
-        if (idx === -1) {
-          // 커스텀 추가 캐릭터 지원
-          return [b.word, b.img, b.caption || "", b.checked ? 1 : 0];
-        }
-        return [idx, b.caption || "", b.checked ? 1 : 0];
-      });
+        if (idx === -1) idx = 0;
+        return b.caption ? `${idx}:${encodeURIComponent(b.caption)}` : `${idx}`;
+      }).join(",");
 
-      const payload = {
-        t: document.getElementById("boardTitle").value.trim(),
-        s: currentSize,
-        c: currentCriteria,
-        d: miniItems,
-        ts: Date.now()
-      };
-
-      const jsonStr = JSON.stringify(payload);
-      const utf8Bytes = encodeURIComponent(jsonStr).replace(/%([0-9A-F]{2})/g, (match, p1) => {
-        return String.fromCharCode('0x' + p1);
-      });
-      const hashData = btoa(utf8Bytes);
-      const shareUrl = `${window.location.origin}${window.location.pathname}#${hashData}`;
+      const hashString = `title=${title}&size=${size}&mode=${mode}&items=${itemTokens}&ts=${Date.now()}`;
+      const shareUrl = `${window.location.origin}${window.location.pathname}#${hashString}`;
 
       try {
-        history.replaceState(null, "", `#${hashData}`);
+        history.replaceState(null, "", `#${hashString}`);
       } catch (e) {}
 
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -961,65 +952,61 @@
       }
     }
 
-    // 초경량 링크 복원
+    // 2. 심플 파라미터 기반 링크 파싱
     function checkSharedUrl() {
       if (!window.location.hash || window.location.hash.length <= 1) return false;
 
       try {
         const rawHash = window.location.hash.substring(1);
-        const decodedBytes = atob(rawHash);
-        const jsonStr = decodeURIComponent(Array.prototype.map.call(decodedBytes, c => {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
+        const params = new URLSearchParams(rawHash);
+        
+        const title = params.get("title");
+        const size = parseInt(params.get("size"), 10);
+        const mode = params.get("mode");
+        const itemsStr = params.get("items");
 
-        const payload = JSON.parse(jsonStr);
-
-        if (payload.t !== undefined) {
-          document.getElementById("boardTitle").value = payload.t;
+        if (title) {
+          document.getElementById("boardTitle").value = decodeURIComponent(title);
         }
-        if (payload.s) {
-          currentSize = payload.s;
+        if (size) {
+          currentSize = size;
           document.querySelectorAll(".size-btn").forEach(btn => {
-            btn.classList.toggle("active", btn.innerText.includes(`${currentSize} x ${currentSize}`));
+            btn.classList.toggle("active", btn.innerText.includes(`${size} x ${size}`));
           });
         }
-        if (payload.c) {
-          setCriteria(payload.c);
+        if (mode) {
+          setCriteria(mode);
         }
 
-        if (Array.isArray(payload.d) && payload.d.length === currentSize * currentSize) {
-          currentBoard = payload.d.map(dItem => {
-            if (typeof dItem[0] === "number") {
-              const baseStudent = itemList[dItem[0]] || { word: "알 수 없음", img: "" };
+        if (itemsStr) {
+          const tokens = itemsStr.split(",");
+          if (tokens.length === currentSize * currentSize) {
+            currentBoard = tokens.map(token => {
+              const [idxStr, capStr] = token.split(":");
+              const idx = parseInt(idxStr, 10);
+              const student = itemList[idx] || { word: "알 수 없음", img: "" };
               return {
-                word: baseStudent.word,
-                img: baseStudent.img,
-                caption: dItem[1] || "",
-                checked: dItem[2] === 1
+                word: student.word,
+                img: student.img,
+                caption: capStr ? decodeURIComponent(capStr) : "",
+                checked: false
               };
-            } else {
-              return {
-                word: dItem[0],
-                img: dItem[1],
-                caption: dItem[2] || "",
-                checked: dItem[3] === 1
-              };
-            }
-          });
+            });
 
-          renderGameBoard();
-          document.getElementById("gameArea").style.display = "block";
-          document.getElementById("btnShare").style.display = "block";
-          updateScore();
-          return true;
+            renderGameBoard();
+            document.getElementById("gameArea").style.display = "block";
+            document.getElementById("btnShare").style.display = "block";
+            updateScore();
+            return true;
+          }
         }
       } catch (e) {
-        console.error("공유 데이터 복원 실패:", e);
+        console.error("공유 링크 파싱 오류:", e);
       }
       return false;
     }
 
-    // 비율 유지 정사각 크롭 이미지 저장
+    // 3. 비율 유지 크롭 이미지 내보내기 (커스텀 제목 파일명)
     async function exportAsImage() {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
