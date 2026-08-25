@@ -471,7 +471,7 @@
           <div style="display: flex; justify-content: flex-end; margin-bottom: 6px;">
             <button class="link-btn" onclick="reloadDefaultJson()">기본값으로 새로고침</button>
           </div>
-          <textarea id="customInput" placeholder="단어 | 이미지URL 형식으로 한 줄씩 입력하세요."></textarea>
+          <textarea id="customInput" placeholder="단어 | 이미지URL | 약칭 형식으로 한 줄씩 입력하세요."></textarea>
           <div style="display: flex; gap: 8px; margin-top: 8px;">
             <button class="action-btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;" onclick="saveCustomItems()">목록 적용 & 저장</button>
           </div>
@@ -538,6 +538,8 @@
     </div>
   </div>
 
+  <!-- 데이터 스크립트 연결 -->
+  <script src="./items_data.js"></script>
   <script>
     let currentSize = 5;
     let itemList = [];
@@ -550,39 +552,39 @@
     let selectedSwapIndex = null;
     let draggedIndex = null;
 
-    async function fetchDefaultItems() {
-      try {
-        const response = await fetch("./items.json");
-        if (!response.ok) throw new Error("JSON 응답 실패");
-        return await response.json();
-      } catch (err) {
-        console.warn("items.json 로드 실패:", err);
-        return [];
-      }
-    }
-
-    async function initApp() {
-      const saved = localStorage.getItem("custom_image_bingo_items");
-      if (saved) {
-        try {
-          itemList = JSON.parse(saved);
-        } catch (e) {
-          itemList = await fetchDefaultItems();
-        }
+    function initApp() {
+      // 1. items_data.js의 전역 기본값 우선 로드
+      if (window.DEFAULT_ITEMS && window.DEFAULT_ITEMS.length > 0) {
+        itemList = JSON.parse(JSON.stringify(window.DEFAULT_ITEMS));
       } else {
-        itemList = await fetchDefaultItems();
+        // 로컬스토리지 백업
+        try {
+          const saved = localStorage.getItem("custom_image_bingo_items");
+          itemList = saved ? JSON.parse(saved) : [];
+        } catch (e) {
+          itemList = [];
+        }
       }
-      
+
+      // 2. 화면 UI 갱신
       updateTextarea();
       renderItemPool();
       autoSelectItems();
       checkSharedUrl();
     }
 
-    async function reloadDefaultJson() {
-      if (confirm("items.json 파일의 원본 데이터로 초기화하시겠습니까?")) {
-        localStorage.removeItem("custom_image_bingo_items");
-        itemList = await fetchDefaultItems();
+    function reloadDefaultJson() {
+      if (confirm("기본 데이터로 초기화하시겠습니까?")) {
+        try {
+          localStorage.removeItem("custom_image_bingo_items");
+        } catch(e) {}
+        
+        if (window.DEFAULT_ITEMS && window.DEFAULT_ITEMS.length > 0) {
+          itemList = JSON.parse(JSON.stringify(window.DEFAULT_ITEMS));
+        } else {
+          itemList = [];
+        }
+
         updateTextarea();
         selectedIndices.clear();
         document.getElementById("searchInput").value = "";
@@ -593,68 +595,78 @@
     }
 
     function updateTextarea() {
-      document.getElementById("customInput").value = itemList.map(i => `${i.word} | ${i.img}`).join("\n");
+      const textarea = document.getElementById("customInput");
+      if (!textarea) return;
+      textarea.value = itemList.map(i => {
+        const word = (i.word || "").trim();
+        const img = (i.img || "").trim();
+        const alias = (i.alias || "").trim();
+        return alias ? `${word} | ${img} | ${alias}` : `${word} | ${img}`;
+      }).join("\n");
     }
 
-  function saveCustomItems() {
-    const text = document.getElementById("customInput").value;
-    const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
-    const parsed = [];
-  
-    lines.forEach(line => {
-      const parts = line.split("|").map(p => p.trim());
-      if (parts.length >= 3) {
-        parsed.push({ word: parts[0], img: parts[1], alias: parts[2] });
-      } else if (parts.length === 2) {
-        parsed.push({ word: parts[0], img: parts[1], alias: "" });
-      } else if (parts.length === 1) {
-        parsed.push({ word: parts[0], img: "", alias: "" });
+    function saveCustomItems() {
+      const text = document.getElementById("customInput").value;
+      const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+      const parsed = [];
+      
+      lines.forEach(line => {
+        const parts = line.split("|").map(p => p.trim());
+        if (parts.length >= 3) {
+          parsed.push({ word: parts[0], img: parts[1], alias: parts[2] });
+        } else if (parts.length === 2) {
+          parsed.push({ word: parts[0], img: parts[1], alias: "" });
+        } else if (parts.length === 1) {
+          parsed.push({ word: parts[0], img: "", alias: "" });
+        }
+      });
+      
+      if (parsed.length < 16) {
+        alert("최소 16개 이상의 캐릭터가 필요합니다.");
+        return;
       }
-    });
-  
-    if (parsed.length < 16) {
-      alert("최소 16개 이상의 캐릭터가 필요합니다.");
-      return;
-  }
 
-  itemList = parsed;
-  localStorage.setItem("custom_image_bingo_items", JSON.stringify(itemList));
-  selectedIndices.clear();
-  document.getElementById("searchInput").value = "";
-  currentFilter = "";
-  renderItemPool();
-  autoSelectItems();
-  alert(`${itemList.length}개의 캐릭터가 적용 및 저장되었습니다.`);
-}
+      itemList = parsed;
+      try {
+        localStorage.setItem("custom_image_bingo_items", JSON.stringify(itemList));
+      } catch(e) {}
 
-  function handleSearch() {
+      selectedIndices.clear();
+      document.getElementById("searchInput").value = "";
+      currentFilter = "";
+      renderItemPool();
+      autoSelectItems();
+      alert(`${itemList.length}개의 캐릭터가 적용 및 저장되었습니다.`);
+    }
+
+    function handleSearch() {
       currentFilter = document.getElementById("searchInput").value.trim().toLowerCase();
       renderItemPool();
     }
 
-   function renderItemPool() {
-    const container = document.getElementById("itemPool");
-    container.innerHTML = "";
-    
-    itemList.forEach((item, idx) => {
-      // 본명(word) 또는 약칭(alias)에 검색어가 포함되어 있는지 확인
-      const wordMatch = item.word.toLowerCase().includes(currentFilter);
-      const aliasMatch = item.alias ? item.alias.toLowerCase().includes(currentFilter) : false;
-  
-      if (currentFilter && !wordMatch && !aliasMatch) {
-        return;
-      }
-  
-      const chip = document.createElement("div");
-      chip.className = `pool-chip ${selectedIndices.has(idx) ? "checked" : ""}`;
+    function renderItemPool() {
+      const container = document.getElementById("itemPool");
+      if (!container) return;
+      container.innerHTML = "";
       
-      const imgTag = item.img ? `<img src="${item.img}" alt="${item.word}" loading="lazy" onerror="this.style.display='none'">` : "";
-      chip.innerHTML = `${imgTag}<span>${item.word}</span>`;
-      chip.onclick = () => toggleItemSelection(idx, chip);
-      container.appendChild(chip);
-    });
-    updateSelectionUI();
-}
+      itemList.forEach((item, idx) => {
+        const wordMatch = item.word.toLowerCase().includes(currentFilter);
+        const aliasMatch = item.alias ? item.alias.toLowerCase().includes(currentFilter) : false;
+      
+        if (currentFilter && !wordMatch && !aliasMatch) {
+          return;
+        }
+      
+        const chip = document.createElement("div");
+        chip.className = `pool-chip ${selectedIndices.has(idx) ? "checked" : ""}`;
+        
+        const imgTag = item.img ? `<img src="${item.img}" alt="${item.word}" loading="lazy" onerror="this.style.display='none'">` : "";
+        chip.innerHTML = `${imgTag}<span>${item.word}</span>`;
+        chip.onclick = () => toggleItemSelection(idx, chip);
+        container.appendChild(chip);
+      });
+      updateSelectionUI();
+    }
 
     function toggleItemSelection(idx, chipElement) {
       if (selectedIndices.has(idx)) {
@@ -822,7 +834,6 @@
         
         let captionHTML = "";
         if (isEditMode) {
-          // input 요소 생성 (onblur, onkeydown 등으로 값만 조용히 업데이트)
           captionHTML = `<input type="text" class="cell-caption-input" placeholder="조건(예: 3성, 전2)" value="${item.caption || ""}" onclick="event.stopPropagation()" oninput="currentBoard[${index}].caption = this.value.trim()" onblur="updateScore()" onkeydown="if(event.key==='Enter'){this.blur();}">`;
         } else if (item.caption) {
           captionHTML = `<div class="caption-badge type-${type}">${item.caption}</div>`;
@@ -1022,7 +1033,11 @@
         ctx.strokeStyle = strokeColor;
         ctx.lineWidth = lineWidth;
         ctx.beginPath();
-        ctx.roundRect(x, y, cellSize, cellSize, 8);
+        if (typeof ctx.roundRect === "function") {
+          ctx.roundRect(x, y, cellSize, cellSize, 8);
+        } else {
+          ctx.rect(x, y, cellSize, cellSize);
+        }
         ctx.fill();
         ctx.stroke();
         ctx.clip();
@@ -1047,7 +1062,11 @@
 
           ctx.fillStyle = badgeBg;
           ctx.beginPath();
-          ctx.roundRect(bx, by, bgW, bgH, 4);
+          if (typeof ctx.roundRect === "function") {
+            ctx.roundRect(bx, by, bgW, bgH, 4);
+          } else {
+            ctx.rect(bx, by, bgW, bgH);
+          }
           ctx.fill();
 
           ctx.fillStyle = "#ffffff";
@@ -1071,7 +1090,12 @@
       link.click();
     }
 
-    initApp();
+    // DOM 로드 완료 후 실행
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
   </script>
 </body>
 </html>
