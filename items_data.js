@@ -576,7 +576,7 @@ window.DEFAULT_ITEMS = [
   },
   {
     "word": "유우카(체육복)",
-    "alias": "체유카, 운유카, 황유카",
+    "alias": "체유카, 운유카, 황유카"
     "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10053.webp"
   },
   {
