@@ -31,9 +31,9 @@
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
     }
 
-    /* 뷰 전환용 클래스 */
+    /* 뷰 전환용 (if/else 제어) */
     #setupView, #gameView {
-      display: none; /* JS에서 제어 */
+      display: none; 
     }
 
     .title-input-wrap { margin-bottom: 20px; }
@@ -126,7 +126,7 @@
   <div class="container">
     
     <!-- ========================================== -->
-    <!-- [STATE 1] 설정 뷰 (링크 파라미터가 없을 때) -->
+    <!-- [STATE 1] 설정 화면 (링크 파라미터가 없을 때만 등장) -->
     <!-- ========================================== -->
     <div id="setupView">
       <div class="title-input-wrap">
@@ -179,10 +179,9 @@
 
 
     <!-- ========================================== -->
-    <!-- [STATE 2] 게임 뷰 (링크 파라미터가 있을 때) -->
+    <!-- [STATE 2] 게임 화면 (링크 파라미터가 있을 때 즉시 등장) -->
     <!-- ========================================== -->
     <div id="gameView">
-      <!-- 렌더링된 제목 표시 영역 -->
       <h2 id="gameTitleDisplay" class="game-main-title">블루아카이브 인권 캐릭터 빙고</h2>
 
       <div class="criteria-box">
@@ -216,8 +215,7 @@
       <div class="btn-group">
         <button class="action-btn btn-share" onclick="copyShareUrl(false)">🔗 현재 빙고판 공유 링크 복사</button>
         <button class="action-btn btn-image" onclick="exportAsImage()">📸 빙고 결과 이미지로 저장 (PNG)</button>
-        <!-- 설정 창으로 돌아가기 -->
-        <button class="action-btn btn-secondary" style="margin-top: 12px;" onclick="goToSetupView()">⚙️ 내 빙고판 새로 만들기 (학생/크기 변경)</button>
+        <button class="action-btn btn-secondary" style="margin-top: 12px;" onclick="goToSetupView()">⚙️ 내 빙고판 새로 만들기 (설정으로 돌아가기)</button>
       </div>
     </div>
 
@@ -237,57 +235,68 @@
     let draggedIndex = null;
 
     // ==========================================
-    // 앱 초기화 및 화면 전환 로직 (if/else 명확히 분리)
+    // 앱 초기화 로직 (무한루프 버그 완전히 제거)
     // ==========================================
     function initApp() {
-      // 1. 데이터 로드 대기
-      if (typeof window.DEFAULT_ITEMS === "undefined" || !window.DEFAULT_ITEMS || window.DEFAULT_ITEMS.length === 0) {
-        setTimeout(initApp, 50);
-        return;
+      // 데이터 안정적으로 로드 (타임아웃 무한반복 삭제)
+      try {
+        if (typeof DEFAULT_ITEMS !== "undefined" && DEFAULT_ITEMS.length > 0) {
+          itemList = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+        } else if (typeof window.DEFAULT_ITEMS !== "undefined" && window.DEFAULT_ITEMS.length > 0) {
+          itemList = JSON.parse(JSON.stringify(window.DEFAULT_ITEMS));
+        }
+      } catch (e) {}
+
+      // 만약 데이터 파일 로드에 실패했다면 로컬 스토리지 사용
+      if (itemList.length === 0) {
+        try {
+          const saved = localStorage.getItem("custom_image_bingo_items");
+          itemList = saved ? JSON.parse(saved) : [];
+        } catch (e) {
+          itemList = [];
+        }
       }
-      itemList = JSON.parse(JSON.stringify(window.DEFAULT_ITEMS));
+
       updateTextarea();
 
-      // 2. URL 해시 체크 (if 링크 뒤에 추가 정보 없음 / else 있음)
+      // [핵심 로직] 링크 파라미터가 있는지 검사
       if (window.location.hash && window.location.hash.length > 1) {
-        // [ELSE] 해당 정보에 맞춰 알맞게 배치된 빙고판 생성
         const success = parseSharedUrl();
         if (success) {
-          showGameView();
+          showGameView(); // 파싱 성공: 설정창 숨기고 게임화면만 표시
         } else {
-          showSetupView(); // 파싱 실패 시 설정창 띄움
+          showSetupView(); // 파싱 실패: 다시 설정창으로
         }
       } else {
-        // [IF] 링크 뒤에 추가 정보 없음 -> 빙고판 설정하기 창 등장
-        showSetupView();
+        showSetupView(); // 파라미터 없음: 설정창 표시
       }
     }
 
+    // 설정 화면 켜기
     function showSetupView() {
       document.getElementById('setupView').style.display = 'block';
       document.getElementById('gameView').style.display = 'none';
       
       renderItemPool();
-      // 아무것도 선택 안되어있으면 꽉 채움
       if (selectedIndices.size === 0) {
         autoSelectItems();
       }
     }
 
+    // 게임 화면 켜기
     function showGameView() {
       document.getElementById('setupView').style.display = 'none';
       document.getElementById('gameView').style.display = 'block';
     }
 
+    // 빙고판 새로 만들기 클릭 시 URL 초기화 후 설정창으로
     function goToSetupView() {
-      // URL 클린업 후 설정창으로 
-      history.replaceState(null, "", window.location.pathname);
+      try { history.replaceState(null, "", window.location.pathname); } catch(e) {}
       showSetupView();
     }
 
-
     // ==========================================
-    // 설정 뷰 (Setup View) 관련 함수들
+    // 설정 뷰 (Setup View) 함수들
     // ==========================================
     function changeSize(size) {
       currentSize = size;
@@ -383,17 +392,21 @@
       }
     }
 
-    // 커스텀 데이터 관리
     function reloadDefaultJson() {
       if (confirm("기본 데이터로 초기화하시겠습니까?")) {
         try { localStorage.removeItem("custom_image_bingo_items"); } catch(e) {}
-        if (window.DEFAULT_ITEMS && window.DEFAULT_ITEMS.length > 0) {
-          itemList = JSON.parse(JSON.stringify(window.DEFAULT_ITEMS));
-        } else { itemList = []; }
+        
+        if (typeof DEFAULT_ITEMS !== "undefined" && DEFAULT_ITEMS.length > 0) {
+          itemList = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+        } else {
+          itemList = [];
+        }
+        
         updateTextarea(); selectedIndices.clear(); document.getElementById("searchInput").value = ""; currentFilter = "";
         renderItemPool(); autoSelectItems();
       }
     }
+
     function updateTextarea() {
       const textarea = document.getElementById("customInput");
       if (!textarea) return;
@@ -404,6 +417,7 @@
         return alias ? `${word} | ${img} | ${alias}` : `${word} | ${img}`;
       }).join("\n");
     }
+
     function saveCustomItems() {
       const text = document.getElementById("customInput").value;
       const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
@@ -422,7 +436,7 @@
       alert(`${itemList.length}개의 캐릭터가 적용 및 저장되었습니다.`);
     }
 
-    // 설정 -> 게임화면으로 전환 액션
+    // 설정창에서 [새 빙고판 생성하기] 버튼 클릭
     function generateNewGame() {
       const chosenItems = Array.from(selectedIndices).map(idx => itemList[idx]);
       chosenItems.sort(() => 0.5 - Math.random());
@@ -433,15 +447,17 @@
 
       renderGameBoard();
       updateScore();
+      
+      // 게임화면으로 전환
       showGameView();
       
-      // 새로고침 해도 날아가지 않게 URL 해시에 빙고판 정보 소리없이 저장
+      // 새로고침 해도 살아있게 URL에 몰래 반영
       copyShareUrl(true); 
     }
 
 
     // ==========================================
-    // 게임 뷰 (Game View) 관련 함수들
+    // 게임 뷰 (Game View) 함수들
     // ==========================================
     function setCriteria(mode) {
       currentCriteria = mode;
@@ -575,11 +591,11 @@
       return lines;
     }
 
+
     // ==========================================
-    // 링크 공유 & 파싱
+    // 공유 생성 & 파싱
     // ==========================================
     function copyShareUrl(isSilent = false) {
-      // 뷰에 따라 제목 가져오기 다름 (설정 뷰 vs 게임 뷰)
       let rawTitle = document.getElementById("gameTitleDisplay").innerText;
       if(!rawTitle || rawTitle === "") rawTitle = document.getElementById("boardTitle").value.trim();
       if(!rawTitle) rawTitle = "블루아카이브 인권 캐릭터 빙고";
@@ -601,7 +617,11 @@
 
       if (!isSilent) {
         if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(shareUrl).then(() => { alert("현재 빙고판 링크가 복사되었습니다!"); }).catch(() => { prompt("아래 링크를 복사하세요:", shareUrl); });
+          navigator.clipboard.writeText(shareUrl).then(() => { 
+            alert("현재 빙고판 링크가 복사되었습니다!"); 
+          }).catch(() => { 
+            prompt("아래 링크를 복사하세요:", shareUrl); 
+          });
         } else {
           prompt("아래 링크를 복사하세요:", shareUrl);
         }
@@ -618,12 +638,11 @@
         const mode = params.get("mode");
         const itemsStr = params.get("items");
 
-        if (!itemsStr) return false;
+        if (!itemsStr) return false; // 파싱 실패 시 false
 
-        // 게임 뷰 타이틀 셋업
         const decodedTitle = title ? decodeURIComponent(title) : "블루아카이브 인권 캐릭터 빙고";
         document.getElementById("gameTitleDisplay").innerText = decodedTitle;
-        document.getElementById("boardTitle").value = decodedTitle; // 설정창 동기화
+        document.getElementById("boardTitle").value = decodedTitle;
 
         if (size) {
           currentSize = size;
@@ -640,7 +659,9 @@
           currentBoard = tokens.map(token => {
             const [idxStr, capStr] = token.split(":");
             const idx = parseInt(idxStr, 10);
-            if (!isNaN(idx) && idx >= 0 && idx < itemList.length) selectedIndices.add(idx);
+            if (!isNaN(idx) && idx >= 0 && idx < itemList.length) {
+              selectedIndices.add(idx);
+            }
 
             const student = itemList[idx] || { word: "알 수 없음", img: "" };
             return {
@@ -651,13 +672,14 @@
             };
           });
 
-          // 게임 뷰 렌더링 준비
           renderGameBoard();
           updateScore();
-          return true; // 파싱 성공
+          return true; // 완벽하게 파싱 성공
         }
-      } catch (e) { console.error("공유 링크 파싱 오류:", e); }
-      return false; // 파싱 실패
+      } catch (e) { 
+        console.error("공유 링크 파싱 오류:", e); 
+      }
+      return false; 
     }
 
     // ==========================================
@@ -791,7 +813,7 @@
       link.click();
     }
 
-    // 뒤로가기/해시 변경 이벤트에도 대응
+    // 뒤로가기나 해시 변경 이벤트 처리
     window.addEventListener("hashchange", () => {
       if (window.location.hash && window.location.hash.length > 1) {
         if(parseSharedUrl()) showGameView();
@@ -800,6 +822,7 @@
       }
     });
 
+    // 실행!
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initApp);
     } else {
