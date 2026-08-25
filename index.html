@@ -331,10 +331,8 @@
       object-fit: cover;
       border-radius: 4px;
       pointer-events: none;
-      transition: filter 0.15s ease;
     }
 
-    /* 우측 상단 조건 캡션 (전3 등) */
     .caption-badge {
       position: absolute;
       top: 4px;
@@ -350,7 +348,6 @@
       line-height: 1.2;
     }
 
-    /* 좌측 상단 체크 상태 뱃지 (보유 / 전무★) */
     .state-badge {
       position: absolute;
       top: 4px;
@@ -402,14 +399,12 @@
       margin-top: 2px;
     }
 
-    /* 🟡 상태 1: 명함 보유 (테두리 3px + 소프트 틴트) */
     .cell.status-1 {
       border: 3px solid #eab308 !important;
       background-color: #fefce8;
       box-shadow: inset 0 0 8px rgba(234, 179, 8, 0.15);
     }
 
-    /* 🔵 상태 2: 전용무기 장착 (테두리 3px + 소프트 틴트) */
     .cell.status-2 {
       border: 3px solid #06b6d4 !important;
       background-color: #ecfeff;
@@ -522,16 +517,17 @@
     <!-- 4. 게임 영역 -->
     <div id="gameArea" style="display: none; margin-top: 20px;">
       
+      <!-- 기준 선택 -->
       <div class="criteria-box">
-        <div class="criteria-label">🎯 빙고 판정 기준 선택</div>
+        <div class="criteria-label">🎯 빙고 판정 모드</div>
         <div class="radio-group">
-          <label class="radio-btn active" id="labelOwnership" onclick="setCriteria('ownership')">
-            <input type="radio" name="bingoCriteria" value="ownership" checked>
-            <span>🟡 단순 보유 기준 (명함 이상)</span>
+          <label class="radio-btn active" id="labelTarget" onclick="setCriteria('target')">
+            <input type="radio" name="bingoCriteria" value="target" checked>
+            <span>🎯 캡션 조건 달성 기준 (전무 요구칸은 전무만)</span>
           </label>
-          <label class="radio-btn" id="labelWeapon" onclick="setCriteria('weapon')">
-            <input type="radio" name="bingoCriteria" value="weapon">
-            <span>🔵 전용무기 기준 (전무 장착만)</span>
+          <label class="radio-btn" id="labelOwnership" onclick="setCriteria('ownership')">
+            <input type="radio" name="bingoCriteria" value="ownership">
+            <span>👤 단순 보유 기준 (조건 무관 보유/전무 전체)</span>
           </label>
         </div>
       </div>
@@ -562,7 +558,9 @@
     let selectedIndices = new Set();
     let currentBoard = [];
     let currentFilter = "";
-    let currentCriteria = "ownership";
+    
+    // 'target': 캡션 조건(전무/성급) 충족 여부 판정, 'ownership': 단순 보유 판정
+    let currentCriteria = "target";
 
     let isEditMode = false;
     let selectedSwapIndex = null;
@@ -737,8 +735,8 @@
 
     function setCriteria(mode) {
       currentCriteria = mode;
+      document.getElementById("labelTarget").classList.toggle("active", mode === "target");
       document.getElementById("labelOwnership").classList.toggle("active", mode === "ownership");
-      document.getElementById("labelWeapon").classList.toggle("active", mode === "weapon");
       updateScore();
     }
 
@@ -779,6 +777,7 @@
 
     function updateCaption(index, value) {
       currentBoard[index].caption = value.trim();
+      updateScore();
     }
 
     function renderGameBoard() {
@@ -815,17 +814,15 @@
 
         const imgTag = item.img ? `<img src="${item.img}" alt="${item.word}" loading="lazy" crossorigin="anonymous">` : `<div style="height:60%;"></div>`;
         
-        // 상태 뱃지 (좌측 상단)
         let stateBadgeHTML = "";
         if (!isEditMode) {
           if (item.state === 1) stateBadgeHTML = `<div class="state-badge status-1">보유</div>`;
           if (item.state === 2) stateBadgeHTML = `<div class="state-badge status-2">전무★</div>`;
         }
 
-        // 조건 캡션 (우측 상단)
         let captionHTML = "";
         if (isEditMode) {
-          captionHTML = `<input type="text" class="cell-caption-input" placeholder="조건(예: 전3)" value="${item.caption || ""}" onclick="event.stopPropagation()" oninput="updateCaption(${index}, this.value)">`;
+          captionHTML = `<input type="text" class="cell-caption-input" placeholder="조건(예: 전3, 3성)" value="${item.caption || ""}" onclick="event.stopPropagation()" oninput="updateCaption(${index}, this.value)">`;
         } else if (item.caption) {
           captionHTML = `<div class="caption-badge">${item.caption}</div>`;
         }
@@ -866,17 +863,29 @@
       updateScore();
     }
 
+    // 🎯 캡션 조건 자동 판정 로직
     function isCellValid(item) {
+      if (item.state === 0) return false; // 미보유는 무조건 제외
+
       if (currentCriteria === "ownership") {
+        // 단순 보유 모드: 보유(1) 또는 전무(2) 모두 인정
         return item.state >= 1;
       } else {
-        return item.state === 2;
+        // 목표 조건 달성 모드: 캡션에 '전'(전1~전4 등)이 들어가면 전무(2) 상태만 인정
+        const cap = (item.caption || "").toLowerCase();
+        const requiresWeapon = /전[1-4]|전무|고유/.test(cap);
+
+        if (requiresWeapon) {
+          return item.state === 2; // 전무 요구 칸은 전무(2) 상태여야만 유효
+        } else {
+          return item.state >= 1; // 성급(1~4성) 요구 또는 무조건 칸은 보유(1) 이상이면 유효
+        }
       }
     }
 
     function updateScore() {
       const lines = calculateBingoLines();
-      const criteriaName = currentCriteria === "ownership" ? "보유 기준" : "전용무기 기준";
+      const criteriaName = currentCriteria === "target" ? "조건 달성 기준" : "단순 보유 기준";
       document.getElementById("bingoScore").innerText = `완성된 빙고 (${criteriaName}): ${lines}줄`;
     }
 
@@ -976,7 +985,7 @@
       ctx.textAlign = "center";
       ctx.fillText(title, width / 2, 40);
 
-      const criteriaName = currentCriteria === "ownership" ? "단순 보유 기준" : "전용무기 기준";
+      const criteriaName = currentCriteria === "target" ? "조건 달성 기준" : "단순 보유 기준";
       ctx.fillStyle = "#2563eb";
       ctx.font = "bold 15px -apple-system, sans-serif";
       ctx.fillText(`완성된 빙고 (${criteriaName}): ${calculateBingoLines()}줄`, width / 2, 68);
@@ -1002,7 +1011,6 @@
 
         ctx.save();
         
-        // 카드 배경 색상 (선택 시 부드러운 틴트)
         let bgColor = "#ffffff";
         let strokeColor = "#cbd5e1";
         let lineWidth = 2;
@@ -1026,14 +1034,12 @@
         ctx.stroke();
         ctx.clip();
 
-        // 썸네일 이미지 (선명하게 유지)
         const loadedImg = loadedImages[index];
         const imgH = cellSize * 0.60;
         if (loadedImg) {
           ctx.drawImage(loadedImg, x + 4, y + 4, cellSize - 8, imgH);
         }
 
-        // 좌측 상단 상태 뱃지 (보유 / 전무★)
         if (item.state === 1) {
           ctx.fillStyle = "#eab308";
           ctx.beginPath();
@@ -1058,7 +1064,6 @@
           ctx.fillText("전무★", x + 23, y + 12);
         }
 
-        // 우측 상단 조건 캡션 (전3 등)
         if (item.caption) {
           ctx.font = "bold 10px -apple-system, sans-serif";
           const textMetrics = ctx.measureText(item.caption);
@@ -1078,7 +1083,6 @@
           ctx.fillText(item.caption, bx + bgW / 2, by + bgH / 2);
         }
 
-        // 하단 캐릭터 이름
         ctx.fillStyle = "#1e293b";
         ctx.font = `bold ${cellSize < 70 ? "11px" : "13px"} -apple-system, sans-serif`;
         ctx.textAlign = "center";
