@@ -496,12 +496,12 @@
     <!-- 3. 생성 버튼 -->
     <div class="section" style="border-bottom: none; margin-bottom: 0;">
       <div class="btn-group">
-        <button class="action-btn btn-primary" id="btnGenerate" onclick="generateNewGame()" disabled>새 빙고판 생성하기</button>
+        <button class="action-btn btn-primary" id="btnGenerate" onclick="handleGenerateClick()" disabled>새 빙고판 생성하기</button>
       </div>
     </div>
 
-    <!-- 4. 게임 영역 (생성 또는 링크 복원 시 표시됨) -->
-    <div id="gameArea" style="display: none; margin-top: 20px;">
+    <!-- 4. 게임 영역 -->
+    <div id="gameArea" style="display: none; margin-top: 24px; padding-top: 16px; border-top: 2px solid #e2e8f0;">
       
       <div class="criteria-box">
         <div class="criteria-label">빙고 유형 선택</div>
@@ -546,14 +546,13 @@
     let currentBoard = [];
     let currentFilter = "";
     let currentCriteria = "ownership";
+    let isLoadedFromUrl = false;
 
     let isEditMode = false;
     let selectedSwapIndex = null;
     let draggedIndex = null;
 
-    // 앱 초기화 
     function initApp() {
-      // 데이터 로드 보장
       try {
         if (typeof DEFAULT_ITEMS !== "undefined" && DEFAULT_ITEMS.length > 0) {
           itemList = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
@@ -573,38 +572,31 @@
 
       updateTextarea();
 
-      // 링크(URL)에 파라미터가 있는지 검사
       if (window.location.hash && window.location.hash.length > 1) {
         const success = checkSharedUrl();
         if (!success) {
           loadLocalPoolOrRandom();
         }
       } else {
-        // 링크 없이 접속했을 땐 로컬 스토리지에 저장된 마지막 선택 풀을 복원
         loadLocalPoolOrRandom();
       }
     }
 
-    // 새로고침해도 선택했던 학생들 유지하게 불러오기
     function loadLocalPoolOrRandom() {
       try {
         const savedPool = localStorage.getItem("saved_pool_indices");
         if (savedPool) {
           const arr = JSON.parse(savedPool);
           selectedIndices = new Set(arr.filter(idx => idx >= 0 && idx < itemList.length));
-          
-          if (selectedIndices.size > 0) {
+          if (selectedIndices.size === currentSize * currentSize) {
             renderItemPool();
             return;
           }
         }
       } catch(e) {}
-
-      // 저장된게 없으면 25명 자동 선택
       autoSelectItems();
     }
 
-    // 학생을 선택할 때마다 로컬 스토리지에 1초컷으로 기록 저장
     function savePoolToLocal() {
       try {
         localStorage.setItem("saved_pool_indices", JSON.stringify(Array.from(selectedIndices)));
@@ -620,7 +612,7 @@
       if (selectedIndices.size > maxCount) {
         selectedIndices = new Set(Array.from(selectedIndices).slice(0, maxCount));
         renderItemPool();
-        savePoolToLocal(); // 저장
+        savePoolToLocal();
       }
       updateSelectionUI();
     }
@@ -652,6 +644,7 @@
     }
 
     function toggleItemSelection(idx, chipElement) {
+      isLoadedFromUrl = false;
       if (selectedIndices.has(idx)) {
         selectedIndices.delete(idx);
         chipElement.classList.remove("checked");
@@ -664,10 +657,11 @@
         chipElement.classList.add("checked");
       }
       updateSelectionUI();
-      savePoolToLocal(); // 저장! (새로고침해도 살아있음)
+      savePoolToLocal();
     }
 
     function autoSelectItems() {
+      isLoadedFromUrl = false;
       const target = currentSize * currentSize;
       selectedIndices.clear();
       const indices = Array.from({ length: itemList.length }, (_, i) => i);
@@ -678,6 +672,7 @@
     }
 
     function selectAllItems() {
+      isLoadedFromUrl = false;
       const target = currentSize * currentSize;
       selectedIndices.clear();
       for (let i = 0; i < Math.min(target, itemList.length); i++) {
@@ -688,6 +683,7 @@
     }
 
     function clearSelectedItems() {
+      isLoadedFromUrl = false;
       selectedIndices.clear();
       renderItemPool();
       savePoolToLocal();
@@ -713,13 +709,11 @@
     function reloadDefaultJson() {
       if (confirm("기본 데이터로 초기화하시겠습니까?")) {
         try { localStorage.removeItem("custom_image_bingo_items"); } catch(e) {}
-        
         if (typeof DEFAULT_ITEMS !== "undefined" && DEFAULT_ITEMS.length > 0) {
           itemList = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
         } else {
           itemList = [];
         }
-        
         updateTextarea(); 
         selectedIndices.clear(); 
         document.getElementById("searchInput").value = ""; 
@@ -757,7 +751,18 @@
       alert(`${itemList.length}개의 캐릭터가 적용 및 저장되었습니다.`);
     }
 
+    function handleGenerateClick() {
+      if (isLoadedFromUrl && currentBoard.length > 0) {
+        if (!confirm("현재 공유받은 빙고판 배치가 초기화되고 새로 무작위 배치됩니다. 계속하시겠습니까?")) {
+          document.getElementById("gameArea").scrollIntoView({ behavior: 'smooth' });
+          return;
+        }
+      }
+      generateNewGame();
+    }
+
     function generateNewGame() {
+      isLoadedFromUrl = false;
       const chosenItems = Array.from(selectedIndices).map(idx => itemList[idx]);
       chosenItems.sort(() => 0.5 - Math.random());
       currentBoard = chosenItems.map(item => ({ ...item, caption: "", checked: false }));
@@ -765,16 +770,13 @@
       renderGameBoard();
       updateScore();
       
-      document.getElementById("gameArea").style.display = "block";
-      document.getElementById("gameArea").scrollIntoView({ behavior: 'smooth' });
+      const gameArea = document.getElementById("gameArea");
+      gameArea.style.display = "block";
+      gameArea.scrollIntoView({ behavior: 'smooth' });
       
-      // 새로고침해도 안 날아가게 생성 즉시 링크 업데이트
-      copyShareUrl(true); 
+      copyShareUrl(true);
     }
 
-    // ==========================================
-    // 게임 뷰
-    // ==========================================
     function setCriteria(mode) {
       currentCriteria = mode;
       document.getElementById("labelOwnership").classList.toggle("active", mode === "ownership");
@@ -908,17 +910,12 @@
       return lines;
     }
 
-
-    // ==========================================
-    // 링크 공유 파싱 (버그 해결 핵심)
-    // ==========================================
     function copyShareUrl(isSilent = false) {
       const rawTitle = document.getElementById("boardTitle").value.trim() || "블루아카이브 인권 캐릭터 빙고";
       const title = encodeURIComponent(rawTitle);
       const size = currentSize;
       const mode = currentCriteria;
 
-      // 링크에 캐릭터 정보와 함께 사용자가 빙고판에 체크한 상태(0 또는 1)까지 기록!
       const itemTokens = currentBoard.map(b => {
         let idx = itemList.findIndex(item => item.word === b.word);
         if (idx === -1) idx = 0;
@@ -927,10 +924,10 @@
         return `${idx}:${cap}:${chk}`;
       }).join(",");
 
-      const hashString = `title=${title}&size=${size}&mode=${mode}&items=${itemTokens}&ts=${Date.now()}`;
+      const hashString = `title=${title}&size=${size}&mode=${mode}&items=${itemTokens}`;
       const shareUrl = `${window.location.origin}${window.location.pathname}#${hashString}`;
 
-      try { history.replaceState(null, "", `#${hashString}`); } catch (e) {}
+      window.location.hash = hashString;
 
       if (!isSilent) {
         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -946,56 +943,89 @@
     }
 
     function checkSharedUrl() {
+      const hash = window.location.hash;
+      if (!hash || hash.length <= 1) return false;
+
       try {
-        const rawHash = window.location.hash.substring(1);
-        const params = new URLSearchParams(rawHash);
+        const rawHash = hash.startsWith('#') ? hash.substring(1) : hash;
         
-        const title = params.get("title");
-        const size = parseInt(params.get("size"), 10);
-        const mode = params.get("mode");
-        const itemsStr = params.get("items");
+        const params = {};
+        rawHash.split('&').forEach(pair => {
+          const [k, ...v] = pair.split('=');
+          if (k) params[k] = v.join('=');
+        });
 
-        if (!itemsStr) return false; 
+        const title = params["title"];
+        const sizeStr = params["size"];
+        const mode = params["mode"];
+        const itemsStr = params["items"];
 
-        if (title) document.getElementById("boardTitle").value = decodeURIComponent(title);
-        if (mode) setCriteria(mode);
-        if (size) {
+        if (!itemsStr) return false;
+
+        if (title) {
+          try {
+            document.getElementById("boardTitle").value = decodeURIComponent(title);
+          } catch(e) {
+            document.getElementById("boardTitle").value = title;
+          }
+        }
+
+        const size = parseInt(sizeStr, 10);
+        if (size && !isNaN(size)) {
           currentSize = size;
           document.querySelectorAll(".size-btn").forEach(btn => {
             btn.classList.toggle("active", btn.innerText.includes(`${size} x ${size}`));
           });
         }
 
+        if (mode) {
+          setCriteria(mode);
+        }
+
         const tokens = itemsStr.split(",");
-        if (tokens.length === currentSize * currentSize) {
+        if (tokens.length > 0) {
           selectedIndices.clear();
 
           currentBoard = tokens.map(token => {
             const parts = token.split(":");
             const idx = parseInt(parts[0], 10);
             
-            // ⭐️ 상단 선택 풀에 완벽하게 100% 동기화
             if (!isNaN(idx) && idx >= 0 && idx < itemList.length) {
               selectedIndices.add(idx);
             }
 
-            const student = itemList[idx] || { word: "알 수 없음", img: "" };
+            let captionText = "";
+            if (parts[1]) {
+              try {
+                captionText = decodeURIComponent(parts[1]);
+              } catch(e) {
+                captionText = parts[1];
+              }
+            }
+
+            const student = (!isNaN(idx) && itemList[idx]) ? itemList[idx] : { word: "알 수 없음", img: "" };
             return {
               word: student.word,
               img: student.img,
-              caption: parts[1] ? decodeURIComponent(parts[1]) : "",
-              checked: parts[2] === "1" // 빙고판 체크 기록까지 복원
+              caption: captionText,
+              checked: parts[2] === "1"
             };
           });
 
-          // 복원된 선택을 시각적으로 반영하고 로컬 스토리지에 백업
-          renderItemPool();
-          savePoolToLocal(); 
+          isLoadedFromUrl = true;
 
-          // 게임판 표시
+          renderItemPool();
+          updateSelectionUI();
+
+          const gameArea = document.getElementById("gameArea");
+          gameArea.style.display = "block";
           renderGameBoard();
-          document.getElementById("gameArea").style.display = "block";
           updateScore();
+
+          setTimeout(() => {
+            gameArea.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 100);
+
           return true;
         }
       } catch (e) { 
@@ -1004,9 +1034,6 @@
       return false; 
     }
 
-    // ==========================================
-    // 이미지 저장
-    // ==========================================
     async function exportAsImage() {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
@@ -1135,7 +1162,6 @@
       link.click();
     }
 
-    // 뒤로가기나 해시 변경 이벤트 처리
     window.addEventListener("hashchange", () => {
       if (window.location.hash && window.location.hash.length > 1) {
         checkSharedUrl();
