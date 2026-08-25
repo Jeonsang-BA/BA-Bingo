@@ -500,7 +500,7 @@
       </div>
     </div>
 
-    <!-- 4. 게임 영역 (링크 진입 시 즉시 노출됨) -->
+    <!-- 4. 게임 영역 -->
     <div id="gameArea" style="display: none; margin-top: 24px; padding-top: 16px; border-top: 2px solid #e2e8f0;">
       
       <div class="criteria-box">
@@ -553,9 +553,9 @@
 
     function initApp() {
       try {
-        if (typeof DEFAULT_ITEMS !== "undefined" && DEFAULT_ITEMS.length > 0) {
+        if (typeof DEFAULT_ITEMS !== "undefined" && Array.isArray(DEFAULT_ITEMS) && DEFAULT_ITEMS.length > 0) {
           itemList = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
-        } else if (typeof window.DEFAULT_ITEMS !== "undefined" && window.DEFAULT_ITEMS.length > 0) {
+        } else if (typeof window.DEFAULT_ITEMS !== "undefined" && Array.isArray(window.DEFAULT_ITEMS) && window.DEFAULT_ITEMS.length > 0) {
           itemList = JSON.parse(JSON.stringify(window.DEFAULT_ITEMS));
         }
       } catch (e) {}
@@ -571,13 +571,12 @@
 
       updateTextarea();
 
-      // 링크(해시) 확인 및 직결 복원
+      // 링크(해시) 존재 여부 우선 검사
       let hasShareData = false;
       if (window.location.hash && window.location.hash.length > 1) {
         hasShareData = checkSharedUrl();
       }
 
-      // 링크 정보가 없는 일반 진입 시에만 로컬 스토리지 불러오기
       if (!hasShareData) {
         loadLocalPoolOrRandom();
       }
@@ -748,7 +747,6 @@
       alert(`${itemList.length}개의 캐릭터가 적용 및 저장되었습니다.`);
     }
 
-    // 사용자가 직접 '새로 생성하기'를 눌렀을 때만 랜덤 섞기 발동
     function generateNewGame() {
       const chosenItems = Array.from(selectedIndices).map(idx => itemList[idx]);
       chosenItems.sort(() => 0.5 - Math.random());
@@ -906,7 +904,6 @@
       const size = currentSize;
       const mode = currentCriteria;
 
-      // 0번부터 24번 칸 순서 그대로 items 직렬화
       const itemTokens = currentBoard.map(b => {
         let idx = itemList.findIndex(item => item.word === b.word);
         if (idx === -1) idx = 0;
@@ -933,7 +930,7 @@
       }
     }
 
-    // 링크에서 [1, 2, 5, 4, 3, ...] 순서 그대로 100% 직결 배치
+    // URL 토큰 순서 [0번칸, 1번칸, 2번칸 ...] 그대로 1:1 직결 배치
     function checkSharedUrl() {
       const hash = window.location.hash;
       if (!hash || hash.length <= 1) return false;
@@ -978,7 +975,7 @@
         if (tokens.length > 0) {
           selectedIndices.clear();
 
-          // 토큰 순서 [0번칸, 1번칸, 2번칸...] 그대로 currentBoard 생성
+          // 전달받은 토큰 순서 그대로 currentBoard 배열에 채워넣음
           currentBoard = tokens.map(token => {
             const parts = token.split(":");
             const idx = parseInt(parts[0], 10);
@@ -1005,17 +1002,17 @@
             };
           });
 
-          // 상단 학생 풀 선택 상태 동기화
+          // 상단 풀 체크상태 표시
           renderItemPool();
           updateSelectionUI();
 
-          // 빙고판 즉시 렌더링 및 화면 노출
+          // 빙고판 즉시 강제 오픈 및 렌더링
           const gameArea = document.getElementById("gameArea");
           gameArea.style.display = "block";
           renderGameBoard();
           updateScore();
 
-          // 빙고판 위치로 즉시 스크롤
+          // 즉시 해당 위치로 스크롤
           setTimeout(() => {
             gameArea.scrollIntoView({ behavior: "smooth", block: "start" });
           }, 100);
