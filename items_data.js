@@ -1,0 +1,972 @@
+window.DEFAULT_ITEMS = [
+  {
+    "word": "아루",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10000.webp"
+  },
+  {
+    "word": "에이미",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10001.webp"
+  },
+  {
+    "word": "하루나",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10002.webp"
+  },
+  {
+    "word": "히후미",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10003.webp"
+  },
+  {
+    "word": "히나",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10004.webp"
+  },
+  {
+    "word": "호시노",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10005.webp"
+  },
+  {
+    "word": "이오리",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10006.webp"
+  },
+  {
+    "word": "마키",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10007.webp"
+  },
+  {
+    "word": "네루",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10008.webp"
+  },
+  {
+    "word": "이즈미",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10009.webp"
+  },
+  {
+    "word": "시로코",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10010.webp"
+  },
+  {
+    "word": "슌",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10011.webp"
+  },
+  {
+    "word": "스미레",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10012.webp"
+  },
+  {
+    "word": "츠루기",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10013.webp"
+  },
+  {
+    "word": "아카네",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/13000.webp"
+  },
+  {
+    "word": "치세",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/13001.webp"
+  },
+  {
+    "word": "아카리",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/13002.webp"
+  },
+  {
+    "word": "하스미",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/13003.webp"
+  },
+  {
+    "word": "노노미",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/13004.webp"
+  },
+  {
+    "word": "카요코",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/13005.webp"
+  },
+  {
+    "word": "무츠키",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/13006.webp"
+  },
+  {
+    "word": "준코",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/13007.webp"
+  },
+  {
+    "word": "세리카",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/13008.webp"
+  },
+  {
+    "word": "츠바키",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/13009.webp"
+  },
+  {
+    "word": "유우카",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/13010.webp"
+  },
+  {
+    "word": "하루카",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/16000.webp"
+  },
+  {
+    "word": "아스나",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/16001.webp"
+  },
+  {
+    "word": "코토리",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/16002.webp"
+  },
+  {
+    "word": "스즈미",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/16003.webp"
+  },
+  {
+    "word": "피나",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/16004.webp"
+  },
+  {
+    "word": "히비키",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20000.webp"
+  },
+  {
+    "word": "카린",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20001.webp"
+  },
+  {
+    "word": "사야",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20002.webp"
+  },
+  {
+    "word": "아이리",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/23000.webp"
+  },
+  {
+    "word": "후우카",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/23001.webp"
+  },
+  {
+    "word": "하나에",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/23002.webp"
+  },
+  {
+    "word": "하레",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/23003.webp"
+  },
+  {
+    "word": "우타하",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/23004.webp"
+  },
+  {
+    "word": "아야네",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/23005.webp"
+  },
+  {
+    "word": "치나츠",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/26000.webp"
+  },
+  {
+    "word": "코타마",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/26001.webp"
+  },
+  {
+    "word": "주리",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/26002.webp"
+  },
+  {
+    "word": "세리나",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/26003.webp"
+  },
+  {
+    "word": "시미코",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/26004.webp"
+  },
+  {
+    "word": "요시미",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/26005.webp"
+  },
+  {
+    "word": "마시로",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20003.webp"
+  },
+  {
+    "word": "이즈나",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10014.webp"
+  },
+  {
+    "word": "시즈코",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/23006.webp"
+  },
+  {
+    "word": "아리스",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10015.webp"
+  },
+  {
+    "word": "미도리",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10016.webp"
+  },
+  {
+    "word": "모모이",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/13011.webp"
+  },
+  {
+    "word": "체리노",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10017.webp"
+  },
+  {
+    "word": "노도카",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/26006.webp"
+  },
+  {
+    "word": "유즈",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10018.webp"
+  },
+  {
+    "word": "아즈사",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10019.webp"
+  },
+  {
+    "word": "하나코",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/23007.webp"
+  },
+  {
+    "word": "코하루",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10020.webp"
+  },
+  {
+    "word": "아즈사(수영복)",
+    "alias": "수즈사, 수따끄",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10021.webp"
+  },
+  {
+    "word": "마시로(수영복)",
+    "alias": "수시로",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20004.webp"
+  },
+  {
+    "word": "츠루기(수영복)",
+    "alias": "수루기",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/16005.webp"
+  },
+  {
+    "word": "히후미(수영복)",
+    "alias": "수후미",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20005.webp"
+  },
+  {
+    "word": "히나(수영복)",
+    "alias": "수히나",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10022.webp"
+  },
+  {
+    "word": "이오리(수영복)",
+    "alias": "수오리, 수이오리",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10023.webp"
+  },
+  {
+    "word": "이즈미(수영복)",
+    "alias": "수즈미",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/16006.webp"
+  },
+  {
+    "word": "시로코(라이딩)",
+    "alias": "라로코",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10024.webp"
+  },
+  {
+    "word": "슌(어린이)",
+    "alias": "슈에링, 슈에린",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10025.webp"
+  },
+  {
+    "word": "키리노",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/13012.webp"
+  },
+  {
+    "word": "사야(사복)",
+    "alias": "사사야, 사땃쥐",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20006.webp"
+  },
+  {
+    "word": "네루(바니걸)",
+    "alias": "바네루, 바루",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10026.webp"
+  },
+  {
+    "word": "카린(바니걸)",
+    "alias": "바카린",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10027.webp"
+  },
+  {
+    "word": "아스나(바니걸)",
+    "alias": "바스나",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10028.webp"
+  },
+  {
+    "word": "나츠",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10029.webp"
+  },
+  {
+    "word": "마리",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/23008.webp"
+  },
+  {
+    "word": "하츠네 미쿠",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20007.webp"
+  },
+  {
+    "word": "아코",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20008.webp"
+  },
+  {
+    "word": "체리노(온천)",
+    "alias": "온리노",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20009.webp"
+  },
+  {
+    "word": "치나츠(온천)",
+    "alias": "온나츠",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10030.webp"
+  },
+  {
+    "word": "토모에",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/16007.webp"
+  },
+  {
+    "word": "노도카(온천)",
+    "alias": "온도카",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20010.webp"
+  },
+  {
+    "word": "아루(새해)",
+    "alias": "뉴아루, 정아루, 새아루",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10031.webp"
+  },
+  {
+    "word": "무츠키(새해)",
+    "alias": "정츠키, 뉴츠키, 새츠키",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10032.webp"
+  },
+  {
+    "word": "세리카(새해)",
+    "alias": "정리카, 새리카, 뉴리카, 정캬루, 뉴캬루, 새캬류",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20011.webp"
+  },
+  {
+    "word": "와카모",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10033.webp"
+  },
+  {
+    "word": "후부키",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/16008.webp"
+  },
+  {
+    "word": "세나",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20012.webp"
+  },
+  {
+    "word": "치히로",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20013.webp"
+  },
+  {
+    "word": "미모리",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10034.webp"
+  },
+  {
+    "word": "우이",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10035.webp"
+  },
+  {
+    "word": "히나타",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10036.webp"
+  },
+  {
+    "word": "마리나",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10037.webp"
+  },
+  {
+    "word": "미야코",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10038.webp"
+  },
+  {
+    "word": "사키",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20014.webp"
+  },
+  {
+    "word": "미유",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10039.webp"
+  },
+  {
+    "word": "카에데",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20015.webp"
+  },
+  {
+    "word": "이로하",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20016.webp"
+  },
+  {
+    "word": "미치루",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/16009.webp"
+  },
+  {
+    "word": "츠쿠요",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10040.webp"
+  },
+  {
+    "word": "미사키",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10041.webp"
+  },
+  {
+    "word": "히요리",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20017.webp"
+  },
+  {
+    "word": "아츠코",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10042.webp"
+  },
+  {
+    "word": "와카모(수영복)",
+    "alias": "수카모",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10043.webp"
+  },
+  {
+    "word": "노노미(수영복)",
+    "alias": "수노미",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10044.webp"
+  },
+  {
+    "word": "아야네(수영복)",
+    "alias": "수야네",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/26007.webp"
+  },
+  {
+    "word": "호시노(수영복)",
+    "alias": "수시노",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10045.webp"
+  },
+  {
+    "word": "시즈코(수영복)",
+    "alias": "수즈코",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/26008.webp"
+  },
+  {
+    "word": "이즈나(수영복)",
+    "alias": "수즈나",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10046.webp"
+  },
+  {
+    "word": "치세(수영복)",
+    "alias": "수치세",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10047.webp"
+  },
+  {
+    "word": "사오리",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10048.webp"
+  },
+  {
+    "word": "모에",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20018.webp"
+  },
+  {
+    "word": "카즈사",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10049.webp"
+  },
+  {
+    "word": "코코나",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10050.webp"
+  },
+  {
+    "word": "우타하(응원단)",
+    "alias": "응타하",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10051.webp"
+  },
+  {
+    "word": "노아",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10052.webp"
+  },
+  {
+    "word": "히비키(응원단)",
+    "alias": "치비키",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/16010.webp"
+  },
+  {
+    "word": "아카네(바니걸)",
+    "alias": "바카네",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20019.webp"
+  },
+  {
+    "word": "유우카(체육복)",
+    "alias": "체유카, 운유카, 황유카",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10053.webp"
+  },
+  {
+    "word": "마리(체육복)",
+    "alias": "체마리, 운마리, 황마리"
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10054.webp"
+  },
+  {
+    "word": "하스미(체육복)",
+    "alias": "운스미, 체스미",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/16011.webp"
+  },
+  {
+    "word": "히마리",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20020.webp"
+  },
+  {
+    "word": "시구레",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10055.webp"
+  },
+  {
+    "word": "세리나(크리스마스)",
+    "alias": "클리나, 크리나, 성리나",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10056.webp"
+  },
+  {
+    "word": "하나에(크리스마스)",
+    "alias": "클나에, 성나에",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20021.webp"
+  },
+  {
+    "word": "하루나(새해)",
+    "alias": "새루나, 정루나, 뉴루나",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10057.webp"
+  },
+  {
+    "word": "후우카(새해)",
+    "alias": "새후카, 정후카, 뉴후카, 정우카, 새우카, 뉴우카",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20022.webp"
+  },
+  {
+    "word": "준코(새해)",
+    "alias": "정준코, 새준코, 뉴준코",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/16012.webp"
+  },
+  {
+    "word": "미네",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10058.webp"
+  },
+  {
+    "word": "미카",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10059.webp"
+  },
+  {
+    "word": "메구",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10060.webp"
+  },
+  {
+    "word": "칸나",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20023.webp"
+  },
+  {
+    "word": "사쿠라코",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10061.webp"
+  },
+  {
+    "word": "토키",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10062.webp"
+  },
+  {
+    "word": "나기사",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20024.webp"
+  },
+  {
+    "word": "코유키",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10063.webp"
+  },
+  {
+    "word": "카요코(새해)",
+    "alias": "새요코, 정요코, 뉴요코",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10064.webp"
+  },
+  {
+    "word": "하루카(새해)",
+    "alias": "새루카, 정루카, 뉴루카",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20025.webp"
+  },
+  {
+    "word": "카호",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10065.webp"
+  },
+  {
+    "word": "아리스(메이드)",
+    "alias": "메리스",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10066.webp"
+  },
+  {
+    "word": "토키(바니걸)",
+    "alias": "바토키, 바키",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10067.webp"
+  },
+  {
+    "word": "유즈(메이드)",
+    "alias": "메유즈",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/26009.webp"
+  },
+  {
+    "word": "레이사",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10068.webp"
+  },
+  {
+    "word": "루미",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10069.webp"
+  },
+  {
+    "word": "미나",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10070.webp"
+  },
+  {
+    "word": "미노리",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20026.webp"
+  },
+  {
+    "word": "미야코(수영복)",
+    "alias": "수야코",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10071.webp"
+  },
+  {
+    "word": "사키(수영복)",
+    "alias": "수사키",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10072.webp"
+  },
+  {
+    "word": "미유(수영복)",
+    "alias": "수미유, 수유",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/26010.webp"
+  },
+  {
+    "word": "시로코(수영복)",
+    "alias": "수로코",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20027.webp"
+  },
+  {
+    "word": "우이(수영복)",
+    "alias": "수우이",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10073.webp"
+  },
+  {
+    "word": "히나타(수영복)",
+    "alias": "수나타",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20028.webp"
+  },
+  {
+    "word": "코하루(수영복)",
+    "alias": "수하루",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/16013.webp"
+  },
+  {
+    "word": "하나코(수영복)",
+    "alias": "수나코",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10074.webp"
+  },
+  {
+    "word": "미모리(수영복)",
+    "alias": "수모리",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20029.webp"
+  },
+  {
+    "word": "메루",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10075.webp"
+  },
+  {
+    "word": "모미지",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/13013.webp"
+  },
+  {
+    "word": "코토리(응원단)",
+    "alias": "응토리, 치토리",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10076.webp"
+  },
+  {
+    "word": "하루나(체육복)",
+    "alias": "체루나, 운루나",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20030.webp"
+  },
+  {
+    "word": "이치카",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10077.webp"
+  },
+  {
+    "word": "카스미",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10078.webp"
+  },
+  {
+    "word": "시구레(온천)",
+    "alias": "온구레",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20031.webp"
+  },
+  {
+    "word": "미사카 미코토",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10079.webp"
+  },
+  {
+    "word": "쇼쿠호 미사키",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10080.webp"
+  },
+  {
+    "word": "사텐 루이코",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/26011.webp"
+  },
+  {
+    "word": "유카리",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10081.webp"
+  },
+  {
+    "word": "렌게",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10082.webp"
+  },
+  {
+    "word": "키쿄",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10083.webp"
+  },
+  {
+    "word": "에이미(수영복)",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20032.webp"
+  },
+  {
+    "word": "코타마(캠핑)",
+    "alias": "캠타마",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10084.webp"
+  },
+  {
+    "word": "하레(캠핑)",
+    "alias": "캠하레",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10085.webp"
+  },
+  {
+    "word": "아코(드레스)",
+    "alias": "드아코",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10087.webp"
+  },
+  {
+    "word": "이부키",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/16014.webp"
+  },
+  {
+    "word": "마코토",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20033.webp"
+  },
+  {
+    "word": "히나(드레스)",
+    "alias": "드히나",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10086.webp"
+  },
+  {
+    "word": "카요코(드레스)",
+    "alias": "드요코",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10088.webp"
+  },
+  {
+    "word": "아루(드레스)",
+    "alias": "드아루, 드레루",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10089.webp"
+  },
+  {
+    "word": "아카리(새해)",
+    "alias": "새카리, 정카리, 뉴카리, 떡카리",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20034.webp"
+  },
+  {
+    "word": "우미카",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10090.webp"
+  },
+  {
+    "word": "츠바키(가이드)",
+    "alias": "가바키",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20035.webp"
+  },
+  {
+    "word": "카즈사(밴드)",
+    "alias": "밴즈사",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10091.webp"
+  },
+  {
+    "word": "요시미(밴드)",
+    "alias": "밴시미",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10092.webp"
+  },
+  {
+    "word": "아이리(밴드)",
+    "alias": "밴이리",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/16015.webp"
+  },
+  {
+    "word": "키라라",
+    "alias": "",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10093.webp"
+  },
+  {
+    "word": "모모이(메이드)",
+    "alias": "메모이",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10094.webp"
+  },
+  {
+    "word": "미도리(메이드)",
+    "alias": "메도리",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10095.webp"
+  },
+  {
+    "word": "세리카(수영복)",
+    "alias": "수리카, 수캬루",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20036.webp"
+  },
+  {
+    "word": "칸나(수영복)",
+    "alias": "수칸나",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10096.webp"
+  },
+  {
+    "word": "후부키(수영복)",
+    "alias": "수부키, 물도넛, 수후부키",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/20037.webp"
+  },
+  {
+    "word": "키리노(수영복)",
+    "alias": "수리노",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/26012.webp"
+  },
+  {
+    "word": "모에(수영복)",
+    "alias": "수모에",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10097.webp"
+  },
+  {
+    "word": "호시노(무장)",
+    "alias": "무시노, 임시노",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10098.webp"
+  },
+  {
+    "word": "호시노(무장)",
+    "alias": "무시노, 임시노",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10099.webp"
+  },
+  {
+    "word": "시로코*테러",
+    "alias": "쿠로코",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10100.webp"
+  },
+  {
+    "word": "아츠코(수영복)",
+    "alias": "수츠코",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/26013.webp"
+  },
+  {
+    "word": "사오리(수영복)",
+    "alias": "수오리, 싸오리, 수사오리",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10101.webp"
+  },
+  {
+    "word": "히요리(수영복)",
+    "alias": "수요리",
+    "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10102.webp"
+  }
+]
