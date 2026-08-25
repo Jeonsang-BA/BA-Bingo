@@ -538,8 +538,6 @@
     </div>
   </div>
 
-  <!-- 데이터 스크립트 연결 -->
-<!-- 데이터 스크립트 연결 -->
   <script src="./items_data.js"></script>
   <script>
     let currentSize = 5;
@@ -553,10 +551,8 @@
     let selectedSwapIndex = null;
     let draggedIndex = null;
 
-    // 1. 앱 초기화 (공유 링크 우선 판별)
     function initApp() {
-      const isLoadedFromShare = checkSharedUrl();
-
+      // 1. 기본 학생 데이터 로드
       if (window.DEFAULT_ITEMS && window.DEFAULT_ITEMS.length > 0) {
         itemList = JSON.parse(JSON.stringify(window.DEFAULT_ITEMS));
       } else {
@@ -571,6 +567,8 @@
       updateTextarea();
       renderItemPool();
 
+      // 2. 공유 링크 파싱 시도 (링크가 없으면 랜덤 자동 선택)
+      const isLoadedFromShare = checkSharedUrl();
       if (!isLoadedFromShare) {
         autoSelectItems();
       }
@@ -922,77 +920,106 @@
       return lines;
     }
 
-// 2. 링크 복사 함수 (제목이 같아도 무조건 고유 해시로 갱신)
-function copyShareUrl() {
-  const chosenItems = currentBoard.map(b => ({
-    word: b.word,
-    img: b.img,
-    caption: b.caption || "",
-    checked: b.checked || false
-  }));
-  
-  const payload = {
-    t: document.getElementById("boardTitle").value.trim(),
-    s: currentSize,
-    c: currentCriteria,
-    items: chosenItems,
-    ts: Date.now() // 고유 타임스탬프 추가로 동일 제목 덮어쓰기/무시 현상 방지
-  };
-  
-  const hashData = encodeURIComponent(JSON.stringify(payload));
-  const shareUrl = `${window.location.origin}${window.location.pathname}#${hashData}`;
-
-  // 현재 브라우저 주소창도 방금 만든 공유 링크로 즉시 동기화
-  try {
-    history.replaceState(null, "", `#${hashData}`);
-  } catch (e) {}
-
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(shareUrl).then(() => {
-      alert("현재 빙고판 링크가 복사되었습니다!");
-    }).catch(() => {
-      prompt("아래 링크를 복사하세요:", shareUrl);
-    });
-  } else {
-    prompt("아래 링크를 복사하세요:", shareUrl);
-  }
-}
-
-// 3. 공유 링크 자동 파싱 함수
-function checkSharedUrl() {
-  if (!window.location.hash || window.location.hash.length <= 1) return false;
-
-  try {
-    const rawHash = window.location.hash.substring(1);
-    const payload = JSON.parse(decodeURIComponent(rawHash));
-
-    if (payload.t !== undefined) {
-      document.getElementById("boardTitle").value = payload.t;
-    }
-    if (payload.s) {
-      currentSize = payload.s;
-      document.querySelectorAll(".size-btn").forEach(btn => {
-        btn.classList.toggle("active", btn.innerText.includes(`${currentSize} x ${currentSize}`));
+    // 초경량 링크 공유 (URL 길이 축소 및 유니코드 안전 인코딩)
+    function copyShareUrl() {
+      const miniItems = currentBoard.map(b => {
+        let idx = itemList.findIndex(item => item.word === b.word);
+        if (idx === -1) {
+          // 커스텀 추가 캐릭터 지원
+          return [b.word, b.img, b.caption || "", b.checked ? 1 : 0];
+        }
+        return [idx, b.caption || "", b.checked ? 1 : 0];
       });
-    }
-    if (payload.c) {
-      setCriteria(payload.c);
-    }
-    if (Array.isArray(payload.items) && payload.items.length === currentSize * currentSize) {
-      currentBoard = payload.items;
-      renderGameBoard();
-      document.getElementById("gameArea").style.display = "block";
-      document.getElementById("btnShare").style.display = "block";
-      updateScore();
-      return true;
-    }
-  } catch (e) {
-    console.error("공유 데이터 로드 중 오류:", e);
-  }
-  return false;
-}
 
-    // 4. 이미지 저장 (비율 유지 크롭 + 커스텀 파일명)
+      const payload = {
+        t: document.getElementById("boardTitle").value.trim(),
+        s: currentSize,
+        c: currentCriteria,
+        d: miniItems,
+        ts: Date.now()
+      };
+
+      const jsonStr = JSON.stringify(payload);
+      const utf8Bytes = encodeURIComponent(jsonStr).replace(/%([0-9A-F]{2})/g, (match, p1) => {
+        return String.fromCharCode('0x' + p1);
+      });
+      const hashData = btoa(utf8Bytes);
+      const shareUrl = `${window.location.origin}${window.location.pathname}#${hashData}`;
+
+      try {
+        history.replaceState(null, "", `#${hashData}`);
+      } catch (e) {}
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          alert("현재 빙고판 링크가 복사되었습니다!");
+        }).catch(() => {
+          prompt("아래 링크를 복사하세요:", shareUrl);
+        });
+      } else {
+        prompt("아래 링크를 복사하세요:", shareUrl);
+      }
+    }
+
+    // 초경량 링크 복원
+    function checkSharedUrl() {
+      if (!window.location.hash || window.location.hash.length <= 1) return false;
+
+      try {
+        const rawHash = window.location.hash.substring(1);
+        const decodedBytes = atob(rawHash);
+        const jsonStr = decodeURIComponent(Array.prototype.map.call(decodedBytes, c => {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+
+        const payload = JSON.parse(jsonStr);
+
+        if (payload.t !== undefined) {
+          document.getElementById("boardTitle").value = payload.t;
+        }
+        if (payload.s) {
+          currentSize = payload.s;
+          document.querySelectorAll(".size-btn").forEach(btn => {
+            btn.classList.toggle("active", btn.innerText.includes(`${currentSize} x ${currentSize}`));
+          });
+        }
+        if (payload.c) {
+          setCriteria(payload.c);
+        }
+
+        if (Array.isArray(payload.d) && payload.d.length === currentSize * currentSize) {
+          currentBoard = payload.d.map(dItem => {
+            if (typeof dItem[0] === "number") {
+              const baseStudent = itemList[dItem[0]] || { word: "알 수 없음", img: "" };
+              return {
+                word: baseStudent.word,
+                img: baseStudent.img,
+                caption: dItem[1] || "",
+                checked: dItem[2] === 1
+              };
+            } else {
+              return {
+                word: dItem[0],
+                img: dItem[1],
+                caption: dItem[2] || "",
+                checked: dItem[3] === 1
+              };
+            }
+          });
+
+          renderGameBoard();
+          document.getElementById("gameArea").style.display = "block";
+          document.getElementById("btnShare").style.display = "block";
+          updateScore();
+          return true;
+        }
+      } catch (e) {
+        console.error("공유 데이터 복원 실패:", e);
+      }
+      return false;
+    }
+
+    // 비율 유지 정사각 크롭 이미지 저장
     async function exportAsImage() {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
