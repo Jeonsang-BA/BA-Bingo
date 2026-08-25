@@ -969,4 +969,4 @@ window.DEFAULT_ITEMS = [
     "alias": "수요리",
     "img": "https://raw.githubusercontent.com/SchaleDB/SchaleDB/main/images/student/icon/10102.webp"
   }
-]
+];
