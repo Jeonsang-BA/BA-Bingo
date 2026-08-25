@@ -133,7 +133,7 @@
     <div id="setupView">
       <div class="title-input-wrap">
         <label for="boardTitle">📌 빙고 제목</label>
-        <input type="text" id="boardTitle" class="title-input" value="블루아카이브 인권 캐릭터 빙고" placeholder="빙고판 제목을 입력하세요">
+        <input type="text" id="boardTitle" class="title-input" value="블루아카이브 인권 빙고" placeholder="빙고판 제목을 입력하세요">
       </div>
       <div class="section">
         <div class="section-title">1. 빙고판 크기 선택</div>
@@ -175,7 +175,7 @@
 
     <!-- [화면 2] 완성된 빙고판 화면 (링크 접속 또는 생성 시 직결 노출) -->
     <div id="gameView">
-      <h2 id="gameTitleDisplay" class="game-main-title">블루아카이브 인권 캐릭터 빙고</h2>
+      <h2 id="gameTitleDisplay" class="game-main-title">블루아카이브 인권 빙고</h2>
       <div class="criteria-box">
         <div class="criteria-label">빙고 유형 선택</div>
         <div class="radio-group">
@@ -310,7 +310,7 @@
     // [핵심] 현재 배치된 학생들의 인덱스 번호만 순서대로 URL에 저장 (items=1,2,5,4,3...)
     function copyShareUrl(isSilent = false) {
       let rawTitle = document.getElementById("gameTitleDisplay").innerText;
-      if(!rawTitle) rawTitle = document.getElementById("boardTitle").value.trim() || "블루아카이브 인권 캐릭터 빙고";
+      if(!rawTitle) rawTitle = document.getElementById("boardTitle").value.trim() || "블루아카이브 인권 빙고";
 
       const title = encodeURIComponent(rawTitle);
       const size = currentSize;
@@ -493,7 +493,7 @@
       chosenItems.sort(() => 0.5 - Math.random());
       currentBoard = chosenItems.map(item => ({ ...item, caption: "", checked: false }));
       
-      document.getElementById("gameTitleDisplay").innerText = document.getElementById("boardTitle").value.trim() || "블루아카이브 인권 캐릭터 빙고";
+      document.getElementById("gameTitleDisplay").innerText = document.getElementById("boardTitle").value.trim() || "블루아카이브 인권 빙고";
 
       document.getElementById('setupView').style.display = 'none';
       document.getElementById('gameView').style.display = 'block';
@@ -518,12 +518,12 @@
       copyShareUrl(true);
     }
 
-    function getCaptionType(caption) {
-      const cap = (caption || "").trim().toLowerCase();
-      if (/전[1-4]|전무|고유/.test(cap)) return "weapon";
-      else if (/[1-5]성|명함/.test(cap)) return "star";
-      return "none";
-    }
+  function getCaptionType(caption) {
+    const cap = (caption || "").trim().toLowerCase();
+    if (/전[1-4]|전무|고유/.test(cap)) return "weapon";
+    else if (/[1-5]성|명함|^[1-5]$/.test(cap)) return "star";
+    return "none";
+  }
 
     function shuffleCurrentBoard() {
       currentBoard.sort(() => 0.5 - Math.random());
@@ -576,7 +576,7 @@
         const imgTag = item.img ? `<img src="${item.img}" alt="${item.word}" loading="lazy" crossorigin="anonymous">` : `<div style="height:60%;"></div>`;
         let captionHTML = "";
         if (isEditMode) {
-          captionHTML = `<input type="text" class="cell-caption-input" placeholder="조건(예: 3성, 전2)" value="${item.caption || ""}" onclick="event.stopPropagation()" oninput="currentBoard[${index}].caption = this.value.trim()" onblur="updateScore()" onkeydown="if(event.key==='Enter'){this.blur();}">`;
+          captionHTML = `<input type="text" class="cell-caption-input" placeholder="예: 3성, 전2" value="${item.caption || ""}" onclick="event.stopPropagation()" oninput="currentBoard[${index}].caption = this.value.trim()" onblur="updateScore()" onkeydown="if(event.key==='Enter'){this.blur();}">`;
         } else if (item.caption) {
           captionHTML = `<div class="caption-badge type-${type}">${item.caption}</div>`;
         }
@@ -612,7 +612,7 @@
 
     function updateScore() {
       const lines = calculateBingoLines();
-      const criteriaName = currentCriteria === "ownership" ? "단순 보유 기준" : "전용무기 기준";
+      const criteriaName = currentCriteria === "ownership" ? "보유 기준" : "전무 기준";
       const scoreElem = document.getElementById("bingoScore");
       if (scoreElem) { scoreElem.innerText = `완성된 빙고 (${criteriaName}): ${lines}줄`; }
     }
@@ -639,7 +639,7 @@
       canvas.width = width * dpr; canvas.height = totalHeight * dpr; ctx.scale(dpr, dpr);
       ctx.fillStyle = "#f8fafc"; ctx.fillRect(0, 0, width, totalHeight);
       ctx.fillStyle = "#0f172a"; ctx.font = "bold 20px -apple-system, sans-serif"; ctx.textAlign = "center"; ctx.fillText(rawTitle, width / 2, 38);
-      const criteriaName = currentCriteria === "ownership" ? "단순 보유 기준" : "전용무기 기준";
+      const criteriaName = currentCriteria === "ownership" ? "보유 기준" : "전무 기준";
       ctx.fillStyle = "#2563eb"; ctx.font = "bold 14px -apple-system, sans-serif"; ctx.fillText(`완성된 빙고 (${criteriaName}): ${calculateBingoLines()}줄`, width / 2, 65);
       const imagePromises = currentBoard.map(item => {
         return new Promise((resolve) => {
