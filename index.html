@@ -539,6 +539,7 @@
   </div>
 
   <!-- 데이터 스크립트 연결 -->
+<!-- 데이터 스크립트 연결 -->
   <script src="./items_data.js"></script>
   <script>
     let currentSize = 5;
@@ -552,12 +553,13 @@
     let selectedSwapIndex = null;
     let draggedIndex = null;
 
+    // 1. 앱 초기화 (공유 링크 우선 판별)
     function initApp() {
-      // 1. items_data.js의 전역 기본값 우선 로드
+      const isLoadedFromShare = checkSharedUrl();
+
       if (window.DEFAULT_ITEMS && window.DEFAULT_ITEMS.length > 0) {
         itemList = JSON.parse(JSON.stringify(window.DEFAULT_ITEMS));
       } else {
-        // 로컬스토리지 백업
         try {
           const saved = localStorage.getItem("custom_image_bingo_items");
           itemList = saved ? JSON.parse(saved) : [];
@@ -566,11 +568,12 @@
         }
       }
 
-      // 2. 화면 UI 갱신
       updateTextarea();
       renderItemPool();
-      autoSelectItems();
-      checkSharedUrl();
+
+      if (!isLoadedFromShare) {
+        autoSelectItems();
+      }
     }
 
     function reloadDefaultJson() {
@@ -919,60 +922,87 @@
       return lines;
     }
 
+    // 2. 링크 복사 함수 (유형 및 체크상태 포함)
     function copyShareUrl() {
-      const chosenItems = currentBoard.map(b => ({ word: b.word, img: b.img, caption: b.caption || "" }));
+      const chosenItems = currentBoard.map(b => ({
+        word: b.word,
+        img: b.img,
+        caption: b.caption || "",
+        checked: b.checked || false
+      }));
+      
       const payload = {
         t: document.getElementById("boardTitle").value.trim(),
         s: currentSize,
+        c: currentCriteria,
         items: chosenItems
       };
       
-      const hashData = btoa(encodeURIComponent(JSON.stringify(payload)));
+      const hashData = encodeURIComponent(JSON.stringify(payload));
       const shareUrl = `${window.location.origin}${window.location.pathname}#${hashData}`;
 
-      navigator.clipboard.writeText(shareUrl).then(() => {
-        alert("빙고판 링크가 복사되었습니다!");
-      }).catch(() => {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          alert("현재 빙고판 링크가 복사되었습니다!");
+        }).catch(() => {
+          prompt("아래 링크를 복사하세요:", shareUrl);
+        });
+      } else {
         prompt("아래 링크를 복사하세요:", shareUrl);
-      });
+      }
     }
 
+    // 3. 공유 링크 자동 파싱 함수
     function checkSharedUrl() {
-      if (window.location.hash) {
-        try {
-          const hashData = window.location.hash.substring(1);
-          const payload = JSON.parse(decodeURIComponent(atob(hashData)));
+      if (!window.location.hash || window.location.hash.length <= 1) return false;
 
-          if (payload.t) {
-            document.getElementById("boardTitle").value = payload.t;
-          }
+      try {
+        const rawHash = window.location.hash.substring(1);
+        const payload = JSON.parse(decodeURIComponent(rawHash));
+
+        if (payload.t) {
+          document.getElementById("boardTitle").value = payload.t;
+        }
+        if (payload.s) {
           currentSize = payload.s;
-          changeSize(currentSize);
-          currentBoard = payload.items.map(item => ({ ...item, checked: false }));
+          document.querySelectorAll(".size-btn").forEach(btn => {
+            btn.classList.toggle("active", btn.innerText.includes(`${currentSize} x ${currentSize}`));
+          });
+        }
+        if (payload.c) {
+          setCriteria(payload.c);
+        }
+        if (Array.isArray(payload.items) && payload.items.length === currentSize * currentSize) {
+          currentBoard = payload.items;
           renderGameBoard();
           document.getElementById("gameArea").style.display = "block";
           document.getElementById("btnShare").style.display = "block";
           updateScore();
-        } catch (e) {
-          console.error("공유 데이터 로드 실패", e);
+          return true;
         }
+      } catch (e) {
+        console.error("공유 데이터 로드 중 오류:", e);
       }
+      return false;
     }
 
+    // 4. 이미지 저장 (비율 유지 크롭 + 커스텀 파일명)
     async function exportAsImage() {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
       const dpr = 2;
 
-      const title = document.getElementById("boardTitle").value.trim() || "인권 빙고";
+      const rawTitle = document.getElementById("boardTitle").value.trim();
+      const title = rawTitle || "블루아카이브 인권 빙고";
+      
       const width = 640;
-      const padding = 24;
-      const headerHeight = 100;
+      const padding = 20;
+      const headerHeight = 90;
       const boardWidth = width - padding * 2;
       const gap = 8;
       const cellSize = (boardWidth - (currentSize - 1) * gap) / currentSize;
       const boardHeight = cellSize * currentSize + (currentSize - 1) * gap;
-      const totalHeight = headerHeight + boardHeight + padding + 20;
+      const totalHeight = headerHeight + boardHeight + padding + 10;
 
       canvas.width = width * dpr;
       canvas.height = totalHeight * dpr;
@@ -984,12 +1014,12 @@
       ctx.fillStyle = "#0f172a";
       ctx.font = "bold 20px -apple-system, sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText(title, width / 2, 40);
+      ctx.fillText(title, width / 2, 38);
 
       const criteriaName = currentCriteria === "ownership" ? "단순 보유 기준" : "전용무기 기준";
       ctx.fillStyle = "#2563eb";
-      ctx.font = "bold 15px -apple-system, sans-serif";
-      ctx.fillText(`완성된 빙고 (${criteriaName}): ${calculateBingoLines()}줄`, width / 2, 68);
+      ctx.font = "bold 14px -apple-system, sans-serif";
+      ctx.fillText(`완성된 빙고 (${criteriaName}): ${calculateBingoLines()}줄`, width / 2, 65);
 
       const imagePromises = currentBoard.map(item => {
         return new Promise((resolve) => {
@@ -1042,10 +1072,32 @@
         ctx.stroke();
         ctx.clip();
 
+        // 찌그러짐 방지 비율 크롭
         const loadedImg = loadedImages[index];
-        const imgH = cellSize * 0.60;
+        const imgAreaHeight = cellSize * 0.62;
+        const imgPadding = 4;
+        const renderW = cellSize - imgPadding * 2;
+        const renderH = imgAreaHeight - imgPadding;
+
         if (loadedImg) {
-          ctx.drawImage(loadedImg, x + 4, y + 4, cellSize - 8, imgH);
+          const nw = loadedImg.naturalWidth || loadedImg.width;
+          const nh = loadedImg.naturalHeight || loadedImg.height;
+          
+          let sx = 0, sy = 0, sw = nw, sh = nh;
+          const aspect = renderW / renderH;
+          if (nw / nh > aspect) {
+            sw = nh * aspect;
+            sx = (nw - sw) / 2;
+          } else {
+            sh = nw / aspect;
+            sy = (nh - sh) / 2;
+          }
+
+          ctx.drawImage(
+            loadedImg, 
+            sx, sy, sw, sh, 
+            x + imgPadding, y + imgPadding, renderW, renderH
+          );
         }
 
         if (item.caption) {
@@ -1076,21 +1128,26 @@
         }
 
         ctx.fillStyle = "#1e293b";
-        ctx.font = `bold ${cellSize < 70 ? "11px" : "13px"} -apple-system, sans-serif`;
+        ctx.font = `bold ${cellSize < 75 ? "11px" : "13px"} -apple-system, sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(item.word, x + cellSize / 2, y + imgH + (cellSize - imgH) / 2 + 2);
+        ctx.fillText(item.word, x + cellSize / 2, y + imgAreaHeight + (cellSize - imgAreaHeight) / 2 + 1);
 
         ctx.restore();
       });
 
+      const dateStr = new Date().toISOString().slice(0, 10);
+      const sanitizedTitle = title.replace(/[\\/:*?"<>|]/g, "").replace(/\s+/g, "_");
+      const fileName = `${sanitizedTitle}_${dateStr}.png`;
+
       const link = document.createElement("a");
-      link.download = `${title.replace(/\s+/g, '_')}_${Date.now()}.png`;
+      link.download = fileName;
       link.href = canvas.toDataURL("image/png");
       link.click();
     }
 
-    // DOM 로드 완료 후 실행
+    window.addEventListener("hashchange", checkSharedUrl);
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initApp);
     } else {
