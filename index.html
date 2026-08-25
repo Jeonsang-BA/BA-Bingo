@@ -552,8 +552,8 @@
     let selectedSwapIndex = null;
     let draggedIndex = null;
 
+// 1. 앱 초기화 (공유 링크 접속 시 덮어쓰기 방지)
     function initApp() {
-      // 1. 기본 학생 데이터 로드
       if (window.DEFAULT_ITEMS && window.DEFAULT_ITEMS.length > 0) {
         itemList = JSON.parse(JSON.stringify(window.DEFAULT_ITEMS));
       } else {
@@ -566,11 +566,13 @@
       }
 
       updateTextarea();
-      renderItemPool();
 
-      // 2. 공유 링크 파싱 (공유된 상태가 아니면 자동 선택)
+      // 공유 링크인지 먼저 판별
       const isLoadedFromShare = checkSharedUrl();
+
+      // 공유 링크가 아닐 때만 기본 선택 및 자동 선택 수행
       if (!isLoadedFromShare) {
+        renderItemPool();
         autoSelectItems();
       }
     }
@@ -952,7 +954,7 @@
       }
     }
 
-    // 2. 심플 파라미터 기반 링크 파싱
+// 2. 공유 링크 파싱 (선택 상태 및 체크 상태 완벽 복원)
     function checkSharedUrl() {
       if (!window.location.hash || window.location.hash.length <= 1) return false;
 
@@ -965,40 +967,55 @@
         const mode = params.get("mode");
         const itemsStr = params.get("items");
 
+        if (!itemsStr) return false;
+
+        // 제목 복원
         if (title) {
           document.getElementById("boardTitle").value = decodeURIComponent(title);
         }
+        
+        // 판 크기 복원
         if (size) {
           currentSize = size;
           document.querySelectorAll(".size-btn").forEach(btn => {
             btn.classList.toggle("active", btn.innerText.includes(`${size} x ${size}`));
           });
         }
+
+        // 모드 복원
         if (mode) {
           setCriteria(mode);
         }
 
-        if (itemsStr) {
-          const tokens = itemsStr.split(",");
-          if (tokens.length === currentSize * currentSize) {
-            currentBoard = tokens.map(token => {
-              const [idxStr, capStr] = token.split(":");
-              const idx = parseInt(idxStr, 10);
-              const student = itemList[idx] || { word: "알 수 없음", img: "" };
-              return {
-                word: student.word,
-                img: student.img,
-                caption: capStr ? decodeURIComponent(capStr) : "",
-                checked: false
-              };
-            });
+        const tokens = itemsStr.split(",");
+        if (tokens.length === currentSize * currentSize) {
+          selectedIndices.clear();
 
-            renderGameBoard();
-            document.getElementById("gameArea").style.display = "block";
-            document.getElementById("btnShare").style.display = "block";
-            updateScore();
-            return true;
-          }
+          currentBoard = tokens.map(token => {
+            const [idxStr, capStr] = token.split(":");
+            const idx = parseInt(idxStr, 10);
+            
+            // 공유된 학생의 인덱스를 상단 선택 칩에도 동기화
+            if (!isNaN(idx) && idx >= 0 && idx < itemList.length) {
+              selectedIndices.add(idx);
+            }
+
+            const student = itemList[idx] || { word: "알 수 없음", img: "" };
+            return {
+              word: student.word,
+              img: student.img,
+              caption: capStr ? decodeURIComponent(capStr) : "",
+              checked: false
+            };
+          });
+
+          // UI 렌더링 및 게임판 노출
+          renderItemPool();
+          renderGameBoard();
+          document.getElementById("gameArea").style.display = "block";
+          document.getElementById("btnShare").style.display = "block";
+          updateScore();
+          return true;
         }
       } catch (e) {
         console.error("공유 링크 파싱 오류:", e);
