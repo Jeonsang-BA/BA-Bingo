@@ -200,7 +200,6 @@
       font-weight: 700;
     }
 
-    /* 빙고 판정 옵션 바 (보유 vs 전무) */
     .criteria-box {
       background: #f8fafc;
       border: 1.5px solid #cbd5e1;
@@ -309,7 +308,7 @@
       cursor: pointer;
       overflow: hidden;
       user-select: none;
-      transition: transform 0.1s ease, border-color 0.15s ease;
+      transition: all 0.15s ease;
     }
 
     .cell:hover {
@@ -332,21 +331,46 @@
       object-fit: cover;
       border-radius: 4px;
       pointer-events: none;
+      transition: filter 0.15s ease;
     }
 
+    /* 우측 상단 조건 캡션 (전3 등) */
     .caption-badge {
       position: absolute;
       top: 4px;
       right: 4px;
       background: rgba(15, 23, 42, 0.85);
       color: #f8fafc;
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       font-weight: 700;
       padding: 1px 5px;
       border-radius: 4px;
       z-index: 2;
       pointer-events: none;
       line-height: 1.2;
+    }
+
+    /* 좌측 상단 체크 상태 뱃지 (보유 / 전무★) */
+    .state-badge {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 4px;
+      z-index: 2;
+      pointer-events: none;
+      line-height: 1.2;
+      color: #ffffff;
+    }
+    .state-badge.status-1 {
+      background: #eab308;
+      box-shadow: 0 1px 3px rgba(234, 179, 8, 0.4);
+    }
+    .state-badge.status-2 {
+      background: #0891b2;
+      box-shadow: 0 1px 3px rgba(8, 145, 178, 0.4);
     }
 
     .cell-caption-input {
@@ -378,39 +402,18 @@
       margin-top: 2px;
     }
 
-    /* 상태별 오버레이 스타일 (0: 미보유, 1: 명함 보유, 2: 전무 장착) */
+    /* 🟡 상태 1: 명함 보유 (테두리 3px + 소프트 틴트) */
     .cell.status-1 {
-      border-color: #10b981;
-    }
-    .cell.status-1::after {
-      content: "보유";
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(16, 185, 129, 0.75);
-      color: #ffffff;
-      font-size: 1.1rem;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 3;
+      border: 3px solid #eab308 !important;
+      background-color: #fefce8;
+      box-shadow: inset 0 0 8px rgba(234, 179, 8, 0.15);
     }
 
+    /* 🔵 상태 2: 전용무기 장착 (테두리 3px + 소프트 틴트) */
     .cell.status-2 {
-      border-color: #2563eb;
-    }
-    .cell.status-2::after {
-      content: "전무★";
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(37, 99, 235, 0.82);
-      color: #ffffff;
-      font-size: 1.15rem;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 3;
+      border: 3px solid #06b6d4 !important;
+      background-color: #ecfeff;
+      box-shadow: inset 0 0 8px rgba(6, 182, 212, 0.2);
     }
 
     .help-hint {
@@ -519,17 +522,16 @@
     <!-- 4. 게임 영역 -->
     <div id="gameArea" style="display: none; margin-top: 20px;">
       
-      <!-- 빙고 판정 옵션 선택 라디오 바 -->
       <div class="criteria-box">
         <div class="criteria-label">🎯 빙고 판정 기준 선택</div>
         <div class="radio-group">
           <label class="radio-btn active" id="labelOwnership" onclick="setCriteria('ownership')">
             <input type="radio" name="bingoCriteria" value="ownership" checked>
-            <span>👤 단순 보유 기준 (명함 이상)</span>
+            <span>🟡 단순 보유 기준 (명함 이상)</span>
           </label>
           <label class="radio-btn" id="labelWeapon" onclick="setCriteria('weapon')">
             <input type="radio" name="bingoCriteria" value="weapon">
-            <span>⚔️ 전용무기 기준 (전무 장착만)</span>
+            <span>🔵 전용무기 기준 (전무 장착만)</span>
           </label>
         </div>
       </div>
@@ -539,10 +541,10 @@
         <button class="action-btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onclick="resetCheck()">체크 초기화</button>
       </div>
 
-      <div class="help-hint">💡 칸을 누를 때마다 [미보유] ➔ [보유] ➔ [전무★] 순으로 순환합니다.</div>
+      <div class="help-hint">💡 칸을 누를 때마다 [미보유] ➔ [🟡 보유] ➔ [🔵 전무★] 순으로 순환합니다.</div>
 
       <div class="mode-bar">
-        <button class="mode-btn" id="btnEditMode" onclick="toggleEditMode()">✏️ 배치/캡션 직접 수정</button>
+        <button class="mode-btn" id="btnEditMode" onclick="toggleEditMode()">✏️ 배치/조건 직접 수정</button>
         <button class="action-btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onclick="shuffleCurrentBoard()">🔀 무작위 다시 섞기</button>
       </div>
       
@@ -560,8 +562,6 @@
     let selectedIndices = new Set();
     let currentBoard = [];
     let currentFilter = "";
-    
-    // 판정 모드: 'ownership' (보유 이상 인정) vs 'weapon' (전용무기만 인정)
     let currentCriteria = "ownership";
 
     let isEditMode = false;
@@ -745,7 +745,6 @@
     function generateNewGame() {
       const chosenItems = Array.from(selectedIndices).map(idx => itemList[idx]);
       chosenItems.sort(() => 0.5 - Math.random());
-      // state: 0 (미보유), 1 (명함), 2 (전무)
       currentBoard = chosenItems.map(item => ({ ...item, caption: "", state: 0 }));
       
       renderGameBoard();
@@ -765,7 +764,7 @@
       selectedSwapIndex = null;
       const btn = document.getElementById("btnEditMode");
       btn.classList.toggle("active", isEditMode);
-      btn.innerText = isEditMode ? "수정 완료 (플레이 모드)" : "✏️ 배치/캡션 직접 수정";
+      btn.innerText = isEditMode ? "수정 완료 (플레이 모드)" : "✏️ 배치/조건 직접 수정";
       renderGameBoard();
     }
 
@@ -816,6 +815,14 @@
 
         const imgTag = item.img ? `<img src="${item.img}" alt="${item.word}" loading="lazy" crossorigin="anonymous">` : `<div style="height:60%;"></div>`;
         
+        // 상태 뱃지 (좌측 상단)
+        let stateBadgeHTML = "";
+        if (!isEditMode) {
+          if (item.state === 1) stateBadgeHTML = `<div class="state-badge status-1">보유</div>`;
+          if (item.state === 2) stateBadgeHTML = `<div class="state-badge status-2">전무★</div>`;
+        }
+
+        // 조건 캡션 (우측 상단)
         let captionHTML = "";
         if (isEditMode) {
           captionHTML = `<input type="text" class="cell-caption-input" placeholder="조건(예: 전3)" value="${item.caption || ""}" onclick="event.stopPropagation()" oninput="updateCaption(${index}, this.value)">`;
@@ -824,6 +831,7 @@
         }
 
         cell.innerHTML = `
+          ${stateBadgeHTML}
           ${captionHTML}
           ${imgTag}
           <div class="word-label">${item.word}</div>
@@ -842,7 +850,6 @@
               swapCells(selectedSwapIndex, index);
             }
           } else {
-            // 플레이 모드: 0(미보유) -> 1(명함) -> 2(전무) -> 0 순환
             currentBoard[index].state = (currentBoard[index].state + 1) % 3;
             renderGameBoard();
             updateScore();
@@ -859,12 +866,11 @@
       updateScore();
     }
 
-    // 판정 기준에 따른 셀 유효 체크 판정
     function isCellValid(item) {
       if (currentCriteria === "ownership") {
-        return item.state >= 1; // 명함(1) 또는 전무(2) 모두 인정
+        return item.state >= 1;
       } else {
-        return item.state === 2; // 전무(2)만 인정
+        return item.state === 2;
       }
     }
 
@@ -995,26 +1001,64 @@
         const y = headerHeight + row * (cellSize + gap);
 
         ctx.save();
-        ctx.fillStyle = "#ffffff";
         
+        // 카드 배경 색상 (선택 시 부드러운 틴트)
+        let bgColor = "#ffffff";
         let strokeColor = "#cbd5e1";
-        if (item.state === 1) strokeColor = "#10b981";
-        if (item.state === 2) strokeColor = "#2563eb";
+        let lineWidth = 2;
 
+        if (item.state === 1) {
+          bgColor = "#fefce8";
+          strokeColor = "#eab308";
+          lineWidth = 3.5;
+        } else if (item.state === 2) {
+          bgColor = "#ecfeff";
+          strokeColor = "#0891b2";
+          lineWidth = 3.5;
+        }
+
+        ctx.fillStyle = bgColor;
         ctx.strokeStyle = strokeColor;
-        ctx.lineWidth = 2;
+        ctx.lineWidth = lineWidth;
         ctx.beginPath();
         ctx.roundRect(x, y, cellSize, cellSize, 8);
         ctx.fill();
         ctx.stroke();
         ctx.clip();
 
+        // 썸네일 이미지 (선명하게 유지)
         const loadedImg = loadedImages[index];
         const imgH = cellSize * 0.60;
         if (loadedImg) {
           ctx.drawImage(loadedImg, x + 4, y + 4, cellSize - 8, imgH);
         }
 
+        // 좌측 상단 상태 뱃지 (보유 / 전무★)
+        if (item.state === 1) {
+          ctx.fillStyle = "#eab308";
+          ctx.beginPath();
+          ctx.roundRect(x + 4, y + 4, 30, 15, 3);
+          ctx.fill();
+
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "bold 9px -apple-system, sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("보유", x + 19, y + 12);
+        } else if (item.state === 2) {
+          ctx.fillStyle = "#0891b2";
+          ctx.beginPath();
+          ctx.roundRect(x + 4, y + 4, 38, 15, 3);
+          ctx.fill();
+
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "bold 9px -apple-system, sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("전무★", x + 23, y + 12);
+        }
+
+        // 우측 상단 조건 캡션 (전3 등)
         if (item.caption) {
           ctx.font = "bold 10px -apple-system, sans-serif";
           const textMetrics = ctx.measureText(item.caption);
@@ -1034,26 +1078,12 @@
           ctx.fillText(item.caption, bx + bgW / 2, by + bgH / 2);
         }
 
+        // 하단 캐릭터 이름
         ctx.fillStyle = "#1e293b";
         ctx.font = `bold ${cellSize < 70 ? "11px" : "13px"} -apple-system, sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(item.word, x + cellSize / 2, y + imgH + (cellSize - imgH) / 2 + 2);
-
-        // 상태별 렌더링
-        if (item.state === 1) {
-          ctx.fillStyle = "rgba(16, 185, 129, 0.75)";
-          ctx.fillRect(x, y, cellSize, cellSize);
-          ctx.fillStyle = "#ffffff";
-          ctx.font = `bold ${cellSize * 0.25}px -apple-system, sans-serif`;
-          ctx.fillText("보유", x + cellSize / 2, y + cellSize / 2);
-        } else if (item.state === 2) {
-          ctx.fillStyle = "rgba(37, 99, 235, 0.82)";
-          ctx.fillRect(x, y, cellSize, cellSize);
-          ctx.fillStyle = "#ffffff";
-          ctx.font = `bold ${cellSize * 0.25}px -apple-system, sans-serif`;
-          ctx.fillText("전무★", x + cellSize / 2, y + cellSize / 2);
-        }
 
         ctx.restore();
       });
