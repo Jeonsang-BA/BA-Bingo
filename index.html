@@ -333,25 +333,11 @@
       pointer-events: none;
     }
 
+    /* 우측 상단 조건 캡션 */
     .caption-badge {
       position: absolute;
       top: 4px;
       right: 4px;
-      background: rgba(15, 23, 42, 0.85);
-      color: #f8fafc;
-      font-size: 0.65rem;
-      font-weight: 700;
-      padding: 1px 5px;
-      border-radius: 4px;
-      z-index: 2;
-      pointer-events: none;
-      line-height: 1.2;
-    }
-
-    .state-badge {
-      position: absolute;
-      top: 4px;
-      left: 4px;
       font-size: 0.65rem;
       font-weight: 800;
       padding: 1px 6px;
@@ -361,13 +347,14 @@
       line-height: 1.2;
       color: #ffffff;
     }
-    .state-badge.status-1 {
-      background: #eab308;
-      box-shadow: 0 1px 3px rgba(234, 179, 8, 0.4);
+    .caption-badge.type-star {
+      background: rgba(202, 138, 4, 0.9);
     }
-    .state-badge.status-2 {
-      background: #0891b2;
-      box-shadow: 0 1px 3px rgba(8, 145, 178, 0.4);
+    .caption-badge.type-weapon {
+      background: rgba(8, 145, 178, 0.9);
+    }
+    .caption-badge.type-none {
+      background: rgba(15, 23, 42, 0.85);
     }
 
     .cell-caption-input {
@@ -399,14 +386,16 @@
       margin-top: 2px;
     }
 
-    .cell.status-1 {
-      border: 3px solid #eab308 !important;
+    /* 🟡 성급 보유 체크 활성화 스타일 */
+    .cell.checked-star {
+      border: 3.5px solid #eab308 !important;
       background-color: #fefce8;
       box-shadow: inset 0 0 8px rgba(234, 179, 8, 0.15);
     }
 
-    .cell.status-2 {
-      border: 3px solid #06b6d4 !important;
+    /* 🔵 전무 체크 활성화 스타일 */
+    .cell.checked-weapon {
+      border: 3.5px solid #06b6d4 !important;
       background-color: #ecfeff;
       box-shadow: inset 0 0 8px rgba(6, 182, 212, 0.2);
     }
@@ -517,17 +506,16 @@
     <!-- 4. 게임 영역 -->
     <div id="gameArea" style="display: none; margin-top: 20px;">
       
-      <!-- 기준 선택 -->
       <div class="criteria-box">
         <div class="criteria-label">🎯 빙고 판정 모드</div>
         <div class="radio-group">
-          <label class="radio-btn active" id="labelTarget" onclick="setCriteria('target')">
-            <input type="radio" name="bingoCriteria" value="target" checked>
-            <span>🎯 캡션 조건 달성 기준 (전무 요구칸은 전무만)</span>
+          <label class="radio-btn active" id="labelOwnership" onclick="setCriteria('ownership')">
+            <input type="radio" name="bingoCriteria" value="ownership" checked>
+            <span>🟡 단순 보유 기준 (성급/전무 무관 체크된 칸 전체)</span>
           </label>
-          <label class="radio-btn" id="labelOwnership" onclick="setCriteria('ownership')">
-            <input type="radio" name="bingoCriteria" value="ownership">
-            <span>👤 단순 보유 기준 (조건 무관 보유/전무 전체)</span>
+          <label class="radio-btn" id="labelWeapon" onclick="setCriteria('weapon')">
+            <input type="radio" name="bingoCriteria" value="weapon">
+            <span>🔵 전용무기 기준 (전1~전4 조건 칸만)</span>
           </label>
         </div>
       </div>
@@ -537,10 +525,10 @@
         <button class="action-btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onclick="resetCheck()">체크 초기화</button>
       </div>
 
-      <div class="help-hint">💡 칸을 누를 때마다 [미보유] ➔ [🟡 보유] ➔ [🔵 전무★] 순으로 순환합니다.</div>
+      <div class="help-hint">💡 칸을 클릭하여 해당 캐릭터 보유/달성 상태를 체크/해제합니다.</div>
 
       <div class="mode-bar">
-        <button class="mode-btn" id="btnEditMode" onclick="toggleEditMode()">✏️ 배치/조건 직접 수정</button>
+        <button class="mode-btn" id="btnEditMode" onclick="toggleEditMode()">✏️ 배치/조건(3성, 전2 등) 직접 수정</button>
         <button class="action-btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onclick="shuffleCurrentBoard()">🔀 무작위 다시 섞기</button>
       </div>
       
@@ -558,9 +546,7 @@
     let selectedIndices = new Set();
     let currentBoard = [];
     let currentFilter = "";
-    
-    // 'target': 캡션 조건(전무/성급) 충족 여부 판정, 'ownership': 단순 보유 판정
-    let currentCriteria = "target";
+    let currentCriteria = "ownership";
 
     let isEditMode = false;
     let selectedSwapIndex = null;
@@ -735,15 +721,26 @@
 
     function setCriteria(mode) {
       currentCriteria = mode;
-      document.getElementById("labelTarget").classList.toggle("active", mode === "target");
       document.getElementById("labelOwnership").classList.toggle("active", mode === "ownership");
+      document.getElementById("labelWeapon").classList.toggle("active", mode === "weapon");
       updateScore();
+    }
+
+    // 💡 캡션 텍스트로 타입 자동 판별 (weapon / star / none)
+    function getCaptionType(caption) {
+      const cap = (caption || "").trim().toLowerCase();
+      if (/전[1-4]|전무|고유/.test(cap)) {
+        return "weapon";
+      } else if (/[1-5]성|명함/.test(cap)) {
+        return "star";
+      }
+      return "none";
     }
 
     function generateNewGame() {
       const chosenItems = Array.from(selectedIndices).map(idx => itemList[idx]);
       chosenItems.sort(() => 0.5 - Math.random());
-      currentBoard = chosenItems.map(item => ({ ...item, caption: "", state: 0 }));
+      currentBoard = chosenItems.map(item => ({ ...item, caption: "", checked: false }));
       
       renderGameBoard();
       document.getElementById("gameArea").style.display = "block";
@@ -762,7 +759,7 @@
       selectedSwapIndex = null;
       const btn = document.getElementById("btnEditMode");
       btn.classList.toggle("active", isEditMode);
-      btn.innerText = isEditMode ? "수정 완료 (플레이 모드)" : "✏️ 배치/조건 직접 수정";
+      btn.innerText = isEditMode ? "수정 완료 (플레이 모드)" : "✏️ 배치/조건(3성, 전2 등) 직접 수정";
       renderGameBoard();
     }
 
@@ -777,6 +774,7 @@
 
     function updateCaption(index, value) {
       currentBoard[index].caption = value.trim();
+      renderGameBoard();
       updateScore();
     }
 
@@ -787,7 +785,13 @@
 
       currentBoard.forEach((item, index) => {
         const cell = document.createElement("div");
-        const statusClass = !isEditMode ? `status-${item.state}` : "";
+        const type = getCaptionType(item.caption);
+        
+        let statusClass = "";
+        if (!isEditMode && item.checked) {
+          statusClass = type === "weapon" ? "checked-weapon" : "checked-star";
+        }
+
         cell.className = `cell ${statusClass} ${selectedSwapIndex === index ? "edit-source" : ""}`;
         
         if (isEditMode) {
@@ -814,21 +818,14 @@
 
         const imgTag = item.img ? `<img src="${item.img}" alt="${item.word}" loading="lazy" crossorigin="anonymous">` : `<div style="height:60%;"></div>`;
         
-        let stateBadgeHTML = "";
-        if (!isEditMode) {
-          if (item.state === 1) stateBadgeHTML = `<div class="state-badge status-1">보유</div>`;
-          if (item.state === 2) stateBadgeHTML = `<div class="state-badge status-2">전무★</div>`;
-        }
-
         let captionHTML = "";
         if (isEditMode) {
-          captionHTML = `<input type="text" class="cell-caption-input" placeholder="조건(예: 전3, 3성)" value="${item.caption || ""}" onclick="event.stopPropagation()" oninput="updateCaption(${index}, this.value)">`;
+          captionHTML = `<input type="text" class="cell-caption-input" placeholder="조건 (예: 3성, 전2)" value="${item.caption || ""}" onclick="event.stopPropagation()" oninput="updateCaption(${index}, this.value)">`;
         } else if (item.caption) {
-          captionHTML = `<div class="caption-badge">${item.caption}</div>`;
+          captionHTML = `<div class="caption-badge type-${type}">${item.caption}</div>`;
         }
 
         cell.innerHTML = `
-          ${stateBadgeHTML}
           ${captionHTML}
           ${imgTag}
           <div class="word-label">${item.word}</div>
@@ -847,7 +844,8 @@
               swapCells(selectedSwapIndex, index);
             }
           } else {
-            currentBoard[index].state = (currentBoard[index].state + 1) % 3;
+            // 플레이 모드: 체크 토글
+            currentBoard[index].checked = !currentBoard[index].checked;
             renderGameBoard();
             updateScore();
           }
@@ -858,34 +856,26 @@
     }
 
     function resetCheck() {
-      currentBoard.forEach(c => c.state = 0);
+      currentBoard.forEach(c => c.checked = false);
       renderGameBoard();
       updateScore();
     }
 
-    // 🎯 캡션 조건 자동 판정 로직
+    // 빙고 판정 로직
     function isCellValid(item) {
-      if (item.state === 0) return false; // 미보유는 무조건 제외
+      if (!item.checked) return false;
 
       if (currentCriteria === "ownership") {
-        // 단순 보유 모드: 보유(1) 또는 전무(2) 모두 인정
-        return item.state >= 1;
+        return true; // 보유 기준 모드: 체크된 칸 전체 인정
       } else {
-        // 목표 조건 달성 모드: 캡션에 '전'(전1~전4 등)이 들어가면 전무(2) 상태만 인정
-        const cap = (item.caption || "").toLowerCase();
-        const requiresWeapon = /전[1-4]|전무|고유/.test(cap);
-
-        if (requiresWeapon) {
-          return item.state === 2; // 전무 요구 칸은 전무(2) 상태여야만 유효
-        } else {
-          return item.state >= 1; // 성급(1~4성) 요구 또는 무조건 칸은 보유(1) 이상이면 유효
-        }
+        // 전용무기 기준 모드: 캡션이 전1~전4인 칸만 인정
+        return getCaptionType(item.caption) === "weapon";
       }
     }
 
     function updateScore() {
       const lines = calculateBingoLines();
-      const criteriaName = currentCriteria === "target" ? "조건 달성 기준" : "단순 보유 기준";
+      const criteriaName = currentCriteria === "ownership" ? "단순 보유 기준" : "전용무기 기준";
       document.getElementById("bingoScore").innerText = `완성된 빙고 (${criteriaName}): ${lines}줄`;
     }
 
@@ -947,7 +937,7 @@
           }
           currentSize = payload.s;
           changeSize(currentSize);
-          currentBoard = payload.items.map(item => ({ ...item, state: 0 }));
+          currentBoard = payload.items.map(item => ({ ...item, checked: false }));
           renderGameBoard();
           document.getElementById("gameArea").style.display = "block";
           document.getElementById("btnShare").style.display = "block";
@@ -985,7 +975,7 @@
       ctx.textAlign = "center";
       ctx.fillText(title, width / 2, 40);
 
-      const criteriaName = currentCriteria === "target" ? "조건 달성 기준" : "단순 보유 기준";
+      const criteriaName = currentCriteria === "ownership" ? "단순 보유 기준" : "전용무기 기준";
       ctx.fillStyle = "#2563eb";
       ctx.font = "bold 15px -apple-system, sans-serif";
       ctx.fillText(`완성된 빙고 (${criteriaName}): ${calculateBingoLines()}줄`, width / 2, 68);
@@ -1011,18 +1001,21 @@
 
         ctx.save();
         
+        const type = getCaptionType(item.caption);
         let bgColor = "#ffffff";
         let strokeColor = "#cbd5e1";
         let lineWidth = 2;
 
-        if (item.state === 1) {
-          bgColor = "#fefce8";
-          strokeColor = "#eab308";
-          lineWidth = 3.5;
-        } else if (item.state === 2) {
-          bgColor = "#ecfeff";
-          strokeColor = "#0891b2";
-          lineWidth = 3.5;
+        if (item.checked) {
+          if (type === "weapon") {
+            bgColor = "#ecfeff";
+            strokeColor = "#0891b2";
+            lineWidth = 3.5;
+          } else {
+            bgColor = "#fefce8";
+            strokeColor = "#eab308";
+            lineWidth = 3.5;
+          }
         }
 
         ctx.fillStyle = bgColor;
@@ -1040,30 +1033,6 @@
           ctx.drawImage(loadedImg, x + 4, y + 4, cellSize - 8, imgH);
         }
 
-        if (item.state === 1) {
-          ctx.fillStyle = "#eab308";
-          ctx.beginPath();
-          ctx.roundRect(x + 4, y + 4, 30, 15, 3);
-          ctx.fill();
-
-          ctx.fillStyle = "#ffffff";
-          ctx.font = "bold 9px -apple-system, sans-serif";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillText("보유", x + 19, y + 12);
-        } else if (item.state === 2) {
-          ctx.fillStyle = "#0891b2";
-          ctx.beginPath();
-          ctx.roundRect(x + 4, y + 4, 38, 15, 3);
-          ctx.fill();
-
-          ctx.fillStyle = "#ffffff";
-          ctx.font = "bold 9px -apple-system, sans-serif";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillText("전무★", x + 23, y + 12);
-        }
-
         if (item.caption) {
           ctx.font = "bold 10px -apple-system, sans-serif";
           const textMetrics = ctx.measureText(item.caption);
@@ -1072,7 +1041,11 @@
           const bx = x + cellSize - bgW - 4;
           const by = y + 4;
 
-          ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+          let badgeBg = "rgba(15, 23, 42, 0.85)";
+          if (type === "weapon") badgeBg = "rgba(8, 145, 178, 0.9)";
+          if (type === "star") badgeBg = "rgba(202, 138, 4, 0.9)";
+
+          ctx.fillStyle = badgeBg;
           ctx.beginPath();
           ctx.roundRect(bx, by, bgW, bgH, 4);
           ctx.fill();
