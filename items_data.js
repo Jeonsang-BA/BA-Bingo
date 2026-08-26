@@ -495,11 +495,6 @@ window.DEFAULT_ITEMS = [
     "img": "./images/10098.webp"
   },
   {
-    "word": "호시노(무장)",
-    "alias": "무시노, 임시노",
-    "img": "./images/10099.webp"
-  },
-  {
     "word": "시로코*테러",
     "alias": "쿠로코",
     "img": "./images/10100.webp"
