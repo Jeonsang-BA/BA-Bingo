@@ -1115,8 +1115,8 @@ window.DEFAULT_ITEMS = [
     "img": "./images/20038.webp"
   },
   {
-    "word": "키사키(수영복)",
-    "alias": "수사키, 수키키",
+    "word": "키사키",
+    "alias": "",
     "img": "./images/20039.webp"
   },
   {
