@@ -10,3 +10,9 @@ A tool that generates custom bingo boards
 - 블루 아카이브에 실장된 학생이 등장합니다.
 - 4x4, 5x5, 6x6 사이즈의 빙고판을 지원합니다.
 - 만들어진 빙고판을 다른 선생님들과 공유해 봅시다!
+
+
+  
+Data & Assets: Schale DB
+Code Assistant: Google Gemini
+Copyright: © Nexon Games & Yostar
